@@ -10,576 +10,408 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0a0a0f;
-      --card: rgba(255,255,255,0.05);
-      --card-h: rgba(255,255,255,0.09);
-      --bdr: rgba(255,255,255,0.09);
-      --bdr2: rgba(255,255,255,0.16);
-      --t1: #f0f0ff;
-      --t2: #8b8ba8;
-      --t3: #52526a;
-      --violet: #8B5CF6;
-      --cyan: #06B6D4;
-      --rose: #EC4899;
-      --orange: #F97316;
-      --green: #10B981;
-      --yellow: #F59E0B;
-      --blue: #3B82F6;
-      --r: 18px;
-      --r-s: 12px;
-      --r-xs: 8px;
-      --safe-b: env(safe-area-inset-bottom, 0px);
-      --safe-t: env(safe-area-inset-top, 0px);
-      --day-color: var(--violet);
-      --day-alpha: rgba(139,92,246,0.18);
-      --nav-h: 68px;
+      --bg: #0a0a0f; --card: rgba(255,255,255,0.05); --card-h: rgba(255,255,255,0.09);
+      --bdr: rgba(255,255,255,0.09); --bdr2: rgba(255,255,255,0.16);
+      --t1: #f0f0ff; --t2: #8b8ba8; --t3: #52526a;
+      --violet: #8B5CF6; --cyan: #06B6D4; --rose: #EC4899;
+      --orange: #F97316; --green: #10B981; --yellow: #F59E0B; --blue: #3B82F6;
+      --r: 18px; --r-s: 12px; --r-xs: 8px;
+      --safe-b: env(safe-area-inset-bottom, 0px); --safe-t: env(safe-area-inset-top, 0px);
+      --dc: var(--violet); --da: rgba(139,92,246,0.18); --nav-h: 68px;
     }
-
     html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--t1); min-height:100dvh; overflow-x:hidden; line-height:1.5; -webkit-font-smoothing:antialiased; }
 
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--t1);
-      min-height: 100dvh;
-      overflow-x: hidden;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
+    /* ── SVG ICON UTIL ── */
+    .ico { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .ico svg { width:1em; height:1em; }
 
-    /* ── AMBIENT ── */
-    .amb { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .amb-1 { position: absolute; top: -15%; left: -15%; width: 55%; height: 55%; background: radial-gradient(ellipse, rgba(139,92,246,0.09), transparent 70%); }
-    .amb-2 { position: absolute; bottom: -15%; right: -10%; width: 50%; height: 50%; background: radial-gradient(ellipse, rgba(6,182,212,0.07), transparent 70%); }
-    .amb-d { position: absolute; top: 30%; left: 50%; transform: translateX(-50%); width: 70%; height: 40%; background: radial-gradient(ellipse, var(--day-alpha), transparent 70%); transition: background 0.6s ease; }
+    /* ── CANVAS BG ── */
+    .amb { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; filter: blur(60px); }
+    .amb canvas { position:absolute; inset:0; width:100%; height:100%; opacity: 0.8; }
+
+    /* CSS Gradients removed to keep background pure black */
 
     /* ── APP ── */
-    .app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100dvh; }
+    .app { position:relative; z-index:1; display:flex; flex-direction:column; min-height:100dvh; }
 
     /* ── TOPBAR ── */
     .topbar {
-      position: sticky; top: 0; z-index: 100;
-      padding: calc(var(--safe-t) + 10px) clamp(12px, 3vw, 24px) 10px;
-      background: rgba(10,10,15,0.85);
-      backdrop-filter: blur(24px) saturate(1.5);
-      -webkit-backdrop-filter: blur(24px) saturate(1.5);
+      position:sticky; top:0; z-index:100;
+      padding: calc(var(--safe-t)+10px) clamp(12px,3vw,24px) 10px;
+      background: rgba(10,10,15,0.7);
+      backdrop-filter: blur(40px) saturate(1.8); -webkit-backdrop-filter: blur(40px) saturate(1.8);
       border-bottom: 1px solid var(--bdr);
-      display: flex; align-items: center; gap: 10px;
+      display:flex; align-items:center; gap:10px;
       animation: fdDown 0.4s ease both;
     }
-    .top-l { flex: 1; min-width: 0; }
+    .top-l { flex:1; min-width:0; }
     .top-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--violet); background: rgba(139,92,246,0.12);
-      border: 1px solid rgba(139,92,246,0.25);
-      border-radius: 100px; padding: 3px 10px; margin-bottom: 2px;
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+      color:var(--violet); background:rgba(139,92,246,0.12);
+      border:1px solid rgba(139,92,246,0.25);
+      border-radius:100px; padding:3px 10px; margin-bottom:2px;
     }
+    .top-badge .ico { font-size:12px; }
     .top-title {
-      font-size: clamp(16px, 4vw, 22px); font-weight: 900; letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #fff, #c4b5fd 50%, #67e8f9);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-size:clamp(16px,4vw,22px); font-weight:900; letter-spacing:-0.03em;
+      background: linear-gradient(135deg,#fff,#c4b5fd 50%,#67e8f9);
+      background-size:200% 200%; animation: shimmer 4s ease infinite;
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
+    @keyframes shimmer { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
     /* ── LANG PILL ── */
-    .lpill {
-      display: flex; align-items: center;
-      background: var(--card); border: 1px solid var(--bdr);
-      border-radius: 100px; padding: 3px;
-      backdrop-filter: blur(12px);
-      flex-shrink: 0; position: relative;
-    }
-    .lpill-sl {
-      position: absolute; top: 3px; bottom: 3px; border-radius: 100px;
-      background: linear-gradient(135deg, var(--violet), var(--cyan));
-      box-shadow: 0 2px 10px rgba(139,92,246,0.5);
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 1;
-    }
-    .lopt {
-      position: relative; z-index: 2;
-      padding: 5px 10px; font-size: 11px; font-weight: 800;
-      letter-spacing: 0.07em; text-transform: uppercase;
-      color: var(--t3); cursor: pointer; border-radius: 100px;
-      transition: color 0.25s; user-select: none;
-      display: flex; align-items: center; gap: 4px;
-    }
-    .lopt.active { color: #fff; }
-    .lfl { font-size: 13px; line-height: 1; }
+    .lpill { display:flex; align-items:center; background:var(--card); border:1px solid var(--bdr); border-radius:100px; padding:3px; backdrop-filter:blur(20px); flex-shrink:0; position:relative; }
+    .lpill-sl { position:absolute; top:3px; bottom:3px; border-radius:100px; background:linear-gradient(135deg,var(--violet),var(--cyan)); background-size:200% 200%; animation: shimmer 3s ease infinite; box-shadow:0 2px 10px rgba(139,92,246,0.5); transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:1; }
+    .lopt { position:relative; z-index:2; padding:5px 10px; font-size:11px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:var(--t3); cursor:pointer; border-radius:100px; transition:color 0.25s; user-select:none; display:flex; align-items:center; gap:4px; }
+    .lopt.active { color:#fff; }
 
     /* ── DAY STRIP ── */
-    .strip-w {
-      position: sticky; top: calc(var(--safe-t) + 58px); z-index: 90;
-      background: rgba(10,10,15,0.75); backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--bdr);
-      animation: fdDown 0.4s 0.05s ease both;
-    }
-    .strip {
-      display: flex; overflow-x: auto; scrollbar-width: none;
-      padding: 8px clamp(8px, 2vw, 16px); gap: clamp(5px, 1.2vw, 10px);
-      -webkit-overflow-scrolling: touch;
-    }
-    .strip::-webkit-scrollbar { display: none; }
+    .strip-w { position:sticky; top:calc(var(--safe-t)+58px); z-index:90; background:rgba(10,10,15,0.6); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border-bottom:1px solid var(--bdr); animation:fdDown 0.4s 0.05s ease both; }
+    .strip { display:flex; overflow-x:auto; scrollbar-width:none; padding:8px clamp(8px,2vw,16px); gap:clamp(5px,1.2vw,10px); -webkit-overflow-scrolling:touch; }
+    .strip::-webkit-scrollbar { display:none; }
+    .dchip { flex:1 0 0; min-width:48px; display:flex; flex-direction:column; align-items:center; gap:2px; padding:clamp(6px,1.5vw,10px) clamp(6px,1.5vw,14px); border:1px solid var(--bdr); border-radius:var(--r-s); background:var(--card); cursor:pointer; transition:all 0.22s cubic-bezier(0.4,0,0.2,1); position:relative; -webkit-tap-highlight-color:transparent; }
+    .dchip::after { content:''; position:absolute; inset:0; border-radius:var(--r-s); background:var(--dc); opacity:0; transition:opacity 0.22s; }
+    .dchip:active { transform:scale(0.94); }
+    .dchip.on { border-color:var(--dc); box-shadow:0 0 0 1px var(--dc), 0 4px 16px rgba(0,0,0,0.4); }
+    .dchip.on::after { opacity:0.15; }
+    .dchip-e { position:relative; z-index:1; line-height:1; display:flex; align-items:center; justify-content:center; }
+    .dchip-e svg { width:clamp(18px,4.5vw,24px); height:clamp(18px,4.5vw,24px); }
+    .dchip-s { position:relative; z-index:1; font-size:clamp(8px,2vw,11px); font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:var(--t3); transition:color 0.22s; }
+    .dchip.on .dchip-s { color:var(--dc); }
+    .tdot { position:absolute; top:4px; right:4px; z-index:2; width:5px; height:5px; border-radius:50%; background:var(--dc); box-shadow:0 0 6px var(--dc); animation:pdot 2s infinite; }
+    @keyframes pdot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.6} }
 
-    .dchip {
-      flex: 1 0 0; min-width: 48px;
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      padding: clamp(6px, 1.5vw, 10px) clamp(6px, 1.5vw, 14px);
-      border: 1px solid var(--bdr); border-radius: var(--r-s);
-      background: var(--card); cursor: pointer;
-      transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
-      position: relative; -webkit-tap-highlight-color: transparent;
-    }
-    .dchip::after { content: ''; position: absolute; inset: 0; border-radius: var(--r-s); background: var(--day-color); opacity: 0; transition: opacity 0.22s; }
-    .dchip:active { transform: scale(0.94); }
-    .dchip.on { border-color: var(--day-color); box-shadow: 0 0 0 1px var(--day-color), 0 4px 16px rgba(0,0,0,0.4); }
-    .dchip.on::after { opacity: 0.15; }
-    .dchip-e { font-size: clamp(14px, 3.5vw, 18px); position: relative; z-index: 1; line-height: 1; }
-    .dchip-s { position: relative; z-index: 1; font-size: clamp(8px, 2vw, 11px); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3); transition: color 0.22s; }
-    .dchip.on .dchip-s { color: var(--day-color); }
-    .tdot { position: absolute; top: 4px; right: 4px; z-index: 2; width: 5px; height: 5px; border-radius: 50%; background: var(--day-color); box-shadow: 0 0 6px var(--day-color); animation: pdot 2s infinite; }
-    @keyframes pdot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.6; } }
-
-    /* ── SCROLL AREA ── */
-    .scroll {
-      flex: 1; overflow-y: auto;
-      padding: clamp(12px, 3vw, 24px) clamp(10px, 3vw, 24px) calc(var(--nav-h) + var(--safe-b) + 16px);
-      -webkit-overflow-scrolling: touch;
-    }
-    .scroll::-webkit-scrollbar { width: 3px; }
-    .scroll::-webkit-scrollbar-track { background: transparent; }
-    .scroll::-webkit-scrollbar-thumb { background: var(--bdr); border-radius: 10px; }
-
-    /* ── CONTENT WRAPPER — max-width grows with screen ── */
-    .content { max-width: 900px; margin: 0 auto; width: 100%; }
+    /* ── SCROLL ── */
+    .scroll { flex:1; overflow-y:auto; padding:clamp(12px,3vw,24px) clamp(10px,3vw,24px) calc(var(--nav-h)+var(--safe-b)+16px); -webkit-overflow-scrolling:touch; }
+    .scroll::-webkit-scrollbar { width:3px; }
+    .scroll::-webkit-scrollbar-track { background:transparent; }
+    .scroll::-webkit-scrollbar-thumb { background:var(--bdr); border-radius:10px; }
+    .content { max-width:900px; margin:0 auto; width:100%; }
 
     /* ── PANELS ── */
-    .pnl { display: none; }
-    .pnl.on { display: block; animation: pIn 0.35s cubic-bezier(0.4,0,0.2,1) both; }
-    @keyframes pIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .pnl { display:none; }
+    .pnl.on { display:block; animation:pIn 0.35s cubic-bezier(0.4,0,0.2,1) both; }
+    @keyframes pIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
     /* ── HERO ── */
-    .hero {
-      border-radius: var(--r); padding: clamp(16px, 4vw, 28px);
-      background: var(--card); border: 1px solid var(--bdr);
-      backdrop-filter: blur(12px);
-      margin-bottom: clamp(12px, 3vw, 20px);
-      position: relative; overflow: hidden;
-    }
-    .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--day-color), transparent); }
-    .hero-glow { position: absolute; top: -30%; right: -10%; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, var(--day-alpha) 0%, transparent 70%); pointer-events: none; }
-    .hero-top { display: flex; align-items: center; gap: clamp(10px, 3vw, 18px); margin-bottom: clamp(10px, 2vw, 16px); }
-    .hero-ico { width: clamp(44px, 12vw, 60px); height: clamp(44px, 12vw, 60px); flex-shrink: 0; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: clamp(22px, 6vw, 30px); background: rgba(255,255,255,0.07); border: 1px solid var(--bdr); box-shadow: 0 0 16px var(--day-alpha); }
-    .hero-info { min-width: 0; }
-    .hero-info h2 { font-size: clamp(18px, 5vw, 26px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; }
-    .hero-today { font-size: 11px; font-weight: 600; color: var(--day-color); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
-    .hero-today::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--day-color); box-shadow: 0 0 6px var(--day-color); }
-    .hero-muscle { font-size: clamp(11px, 3vw, 14px); font-weight: 600; color: var(--day-color); margin-top: 2px; }
-    .hero-chips { display: flex; gap: 7px; flex-wrap: wrap; }
-    .hero-chip { display: flex; align-items: center; gap: 5px; font-size: clamp(10px, 2.5vw, 12px); font-weight: 600; color: var(--t2); background: rgba(255,255,255,0.05); border: 1px solid var(--bdr); border-radius: 100px; padding: 4px 10px; }
+    .hero { border-radius:var(--r); padding:clamp(16px,4vw,28px); background:var(--card); border:1px solid var(--bdr); backdrop-filter:blur(30px); margin-bottom:clamp(12px,3vw,20px); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--dc),transparent); background-size:200% 100%; animation:borderGlow 3s ease infinite; }
+    @keyframes borderGlow { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .hero-glow { position:absolute; top:-30%; right:-10%; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,var(--da) 0%,transparent 70%); pointer-events:none; animation:orbFloat 6s ease-in-out infinite; }
+    @keyframes orbFloat { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-15px,12px)} }
+    .hero-top { display:flex; align-items:center; gap:clamp(10px,3vw,18px); margin-bottom:clamp(10px,2vw,16px); }
+    .hero-ico { width:clamp(44px,12vw,60px); height:clamp(44px,12vw,60px); flex-shrink:0; border-radius:16px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.07); border:1px solid transparent; box-shadow:0 0 16px var(--da); position:relative; }
+    .hero-ico-ring { position:absolute; inset:-2px; border-radius:18px; padding:2px; overflow:hidden; z-index:0; }
+    .hero-ico-ring::before { content:''; position:absolute; inset:-50%; width:200%; height:200%; background:conic-gradient(from 0deg, var(--dc), transparent 40%, transparent 60%, var(--dc)); animation:ringRotate 4s linear infinite; }
+    .hero-ico-ring::after { content:''; position:absolute; inset:2px; border-radius:16px; background:rgba(10,10,15,0.85); }
+    @keyframes ringRotate { to { transform: rotate(360deg); } }
+    .hero-ico svg { width:clamp(24px,7vw,32px); height:clamp(24px,7vw,32px); position:relative; z-index:1; }
+    .nb-e { position:relative; z-index:1; line-height:1; display:flex; align-items:center; justify-content:center; transition:transform 0.18s; }
+    .nb-e svg { width:clamp(18px,5vw,24px); height:clamp(18px,5vw,24px); }
+    .hero-info { min-width:0; }
+    .hero-info h2 { font-size:clamp(18px,5vw,26px); font-weight:900; letter-spacing:-0.03em; line-height:1.1; }
+    .hero-today { font-size:11px; font-weight:600; color:var(--dc); display:flex; align-items:center; gap:4px; margin-top:2px; }
+    .hero-today .dot-live { width:5px; height:5px; border-radius:50%; background:var(--dc); box-shadow:0 0 6px var(--dc); animation:pdot 2s infinite; }
+    .hero-muscle { font-size:clamp(11px,3vw,14px); font-weight:600; color:var(--dc); margin-top:2px; }
+    .hero-chips { display:flex; gap:7px; flex-wrap:wrap; }
+    .hero-chip { display:flex; align-items:center; gap:5px; font-size:clamp(10px,2.5vw,12px); font-weight:600; color:var(--t2); background:rgba(255,255,255,0.05); border:1px solid var(--bdr); border-radius:100px; padding:4px 10px; }
+    .hero-chip .ico { font-size:12px; color:var(--t3); }
 
     /* ── SECTION HEAD ── */
-    .sec-hd { display: flex; align-items: center; gap: 8px; margin: clamp(16px, 3vw, 24px) 0 clamp(8px, 2vw, 12px); }
-    .sec-ico { width: 30px; height: 30px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-    .sec-tt { font-size: clamp(12px, 3vw, 15px); font-weight: 800; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .sec-tm { font-size: 10px; font-weight: 700; color: var(--t3); background: rgba(255,255,255,0.04); border: 1px solid var(--bdr); border-radius: 100px; padding: 3px 9px; flex-shrink: 0; }
+    .sec-hd { display:flex; align-items:center; gap:8px; margin:clamp(16px,3vw,24px) 0 clamp(8px,2vw,12px); }
+    .sec-ico { width:30px; height:30px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid var(--bdr); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; color:var(--dc); }
+    .sec-tt { font-size:clamp(12px,3vw,15px); font-weight:800; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sec-tm { font-size:10px; font-weight:700; color:var(--t3); background:rgba(255,255,255,0.04); border:1px solid var(--bdr); border-radius:100px; padding:3px 9px; flex-shrink:0; }
 
     /* ── EXERCISE CARD ── */
-    .exl { display: flex; flex-direction: column; gap: 7px; }
-
-    .exc {
-      background: var(--card); border: 1px solid var(--bdr);
-      border-radius: var(--r-s); padding: clamp(10px, 2.5vw, 16px);
-      display: flex; align-items: center; gap: clamp(8px, 2vw, 14px);
-      backdrop-filter: blur(10px); transition: all 0.2s ease;
-      position: relative; overflow: hidden;
-      -webkit-tap-highlight-color: transparent; cursor: default;
-    }
-    .exc::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--day-color); border-radius: 0 3px 3px 0; opacity: 0; transition: opacity 0.2s; }
-    .exc:hover { background: var(--card-h); border-color: var(--bdr2); transform: translateX(3px); box-shadow: 0 4px 20px rgba(0,0,0,0.3), -3px 0 16px var(--day-alpha); }
-    .exc:hover::before { opacity: 1; }
-    .exc:active { transform: scale(0.985); background: var(--card-h); }
-    .exc:active::before { opacity: 1; }
-
-    .exc-i { width: clamp(34px, 9vw, 42px); height: clamp(34px, 9vw, 42px); flex-shrink: 0; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 4vw, 18px); transition: all 0.2s; }
-    .exc:hover .exc-i, .exc:active .exc-i { background: var(--day-alpha); border-color: var(--day-color); }
-
-    .exc-b { flex: 1; min-width: 0; overflow: hidden; }
-    .exc-n { font-size: clamp(12px, 3vw, 14px); font-weight: 700; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-    .exc-t { font-size: clamp(10px, 2.3vw, 11px); color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    /* BADGES inline row */
-    .exc-bgs { display: flex; gap: 4px; flex-shrink: 0; }
-    .exc-bg { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid var(--bdr); border-radius: 7px; padding: clamp(3px, 0.8vw, 5px) clamp(5px, 1.5vw, 10px); min-width: clamp(32px, 9vw, 48px); }
-    .exc-bg-l { font-size: clamp(7px, 1.8vw, 9px); font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: 0.07em; }
-    .exc-bg-v { font-size: clamp(10px, 2.5vw, 13px); font-weight: 800; color: var(--day-color); line-height: 1.2; white-space: nowrap; }
+    .exl { display:flex; flex-direction:column; gap:7px; }
+    .exc { background:var(--card); border:1px solid var(--bdr); border-radius:var(--r-s); padding:clamp(10px,2.5vw,16px); display:flex; align-items:center; gap:clamp(8px,2vw,14px); backdrop-filter:blur(20px); transition:all 0.2s ease; position:relative; overflow:hidden; -webkit-tap-highlight-color:transparent; cursor:default; }
+    .exc::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--dc),transparent); border-radius:0 3px 3px 0; opacity:0; transition:opacity 0.2s; }
+    .exc:hover { background:var(--card-h); border-color:var(--bdr2); transform:translateX(3px); box-shadow:0 4px 20px rgba(0,0,0,0.3),-3px 0 16px var(--da); }
+    .exc:hover::before { opacity:1; }
+    .exc:active { transform:scale(0.985); background:var(--card-h); }
+    .exc:active::before { opacity:1; }
+    .exc-i { width:clamp(34px,9vw,42px); height:clamp(34px,9vw,42px); flex-shrink:0; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--bdr); display:flex; align-items:center; justify-content:center; font-size:clamp(14px,3.5vw,16px); color:var(--dc); transition:all 0.2s; }
+    .exc-i svg { width:1em; height:1em; }
+    .exc:hover .exc-i,.exc:active .exc-i { background:var(--da); border-color:var(--dc); }
+    .exc-b { flex:1; min-width:0; overflow:hidden; }
+    .exc-n { font-size:clamp(12px,3vw,14px); font-weight:700; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+    .exc-t { font-size:clamp(10px,2.3vw,11px); color:var(--t3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px; }
+    .exc-t .ico { font-size:10px; color:var(--yellow); }
+    .exc-bgs { display:flex; gap:4px; flex-shrink:0; }
+    .exc-bg { display:flex; flex-direction:column; align-items:center; background:rgba(255,255,255,0.05); border:1px solid var(--bdr); border-radius:7px; padding:clamp(3px,0.8vw,5px) clamp(5px,1.5vw,10px); min-width:clamp(32px,9vw,48px); }
+    .exc-bg-l { font-size:clamp(7px,1.8vw,9px); font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:0.07em; }
+    .exc-bg-v { font-size:clamp(10px,2.5vw,13px); font-weight:800; color:var(--dc); line-height:1.2; white-space:nowrap; }
 
     /* ── FINISHER ── */
-    .fin {
-      margin-top: 8px; padding: clamp(12px, 3vw, 18px);
-      background: linear-gradient(135deg, rgba(249,115,22,0.13), rgba(236,72,153,0.09));
-      border: 1px solid rgba(249,115,22,0.28); border-radius: var(--r-s);
-      display: flex; align-items: center; gap: 12px;
-    }
-    .fin-ico { font-size: clamp(22px, 6vw, 28px); flex-shrink: 0; }
-    .fin-bd h4 { font-size: 13px; font-weight: 800; color: #FED7AA; margin-bottom: 3px; }
-    .fin-bd p { font-size: clamp(10px, 2.5vw, 12px); color: var(--t2); line-height: 1.4; }
+    .fin { margin-top:8px; padding:clamp(12px,3vw,18px); background:linear-gradient(135deg,rgba(249,115,22,0.13),rgba(236,72,153,0.09)); background-size:200% 200%; animation:meshMove 8s ease infinite; border:1px solid rgba(249,115,22,0.28); border-radius:var(--r-s); display:flex; align-items:center; gap:12px; }
+    .fin-ico { flex-shrink:0; color:var(--orange); font-size:clamp(20px,5vw,24px); }
+    .fin-bd h4 { font-size:13px; font-weight:800; color:#FED7AA; margin-bottom:3px; }
+    .fin-bd p { font-size:clamp(10px,2.5vw,12px); color:var(--t2); line-height:1.4; }
 
     /* ── BOTTOM CARD ── */
-    .bcard { margin-top: clamp(10px, 2.5vw, 16px); padding: clamp(14px, 3vw, 22px); background: var(--card); border: 1px solid var(--bdr); border-radius: var(--r); backdrop-filter: blur(12px); }
-    .bcard-tt { font-size: clamp(11px, 2.8vw, 14px); font-weight: 800; margin-bottom: clamp(8px, 2vw, 14px); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .bcard-sub { font-size: 10px; font-weight: 500; color: var(--t3); }
+    .bcard { margin-top:clamp(10px,2.5vw,16px); padding:clamp(14px,3vw,22px); background:var(--card); border:1px solid var(--bdr); border-radius:var(--r); backdrop-filter:blur(30px); position:relative; overflow:hidden; }
+    .bcard::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--bdr2),transparent); }
+    .bcard-tt { font-size:clamp(11px,2.8vw,14px); font-weight:800; margin-bottom:clamp(8px,2vw,14px); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .bcard-tt .ico { font-size:16px; }
+    .bcard-sub { font-size:10px; font-weight:500; color:var(--t3); }
 
     /* vascu */
-    .vl { display: flex; flex-direction: column; gap: 6px; }
-    .vr { display: flex; align-items: center; gap: 10px; padding: clamp(8px, 2vw, 12px); background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.18); border-radius: var(--r-xs); }
-    .vr-i { font-size: 18px; flex-shrink: 0; }
-    .vr-n { font-size: clamp(11px, 2.5vw, 13px); font-weight: 600; color: var(--t1); flex: 1; min-width: 0; }
-    .vr-r { font-size: clamp(10px, 2.3vw, 12px); font-weight: 700; color: var(--cyan); white-space: nowrap; }
+    .vl { display:flex; flex-direction:column; gap:6px; }
+    .vr { display:flex; align-items:center; gap:10px; padding:clamp(8px,2vw,12px); background:rgba(6,182,212,0.07); border:1px solid rgba(6,182,212,0.18); border-radius:var(--r-xs); }
+    .vr-i { font-size:16px; flex-shrink:0; color:var(--cyan); }
+    .vr-n { font-size:clamp(11px,2.5vw,13px); font-weight:600; color:var(--t1); flex:1; min-width:0; }
+    .vr-r { font-size:clamp(10px,2.3vw,12px); font-weight:700; color:var(--cyan); white-space:nowrap; }
 
     /* rules */
-    .rl { display: flex; flex-direction: column; gap: 6px; }
-    .rr { display: flex; align-items: flex-start; gap: 8px; padding: clamp(7px, 1.8vw, 10px); background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.15); border-radius: var(--r-xs); }
-    .rr-i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
-    .rr-t { font-size: clamp(11px, 2.5vw, 13px); color: var(--t2); font-weight: 500; line-height: 1.4; }
-    .rr-t strong { color: var(--t1); font-weight: 800; }
+    .rl { display:flex; flex-direction:column; gap:6px; }
+    .rr { display:flex; align-items:center; gap:8px; padding:clamp(7px,1.8vw,10px); background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.15); border-radius:var(--r-xs); }
+    .rr-i { font-size:14px; flex-shrink:0; color:var(--yellow); }
+    .rr-t { font-size:clamp(11px,2.5vw,13px); color:var(--t2); font-weight:500; line-height:1.4; }
+    .rr-t strong { color:var(--t1); font-weight:800; }
 
     /* perio */
-    .pl { display: flex; flex-direction: column; gap: 5px; }
-    .pr { display: flex; align-items: center; gap: clamp(6px, 2vw, 12px); padding: clamp(7px, 1.8vw, 10px) clamp(8px, 2vw, 14px); background: rgba(255,255,255,0.03); border: 1px solid var(--bdr); border-radius: var(--r-xs); }
-    .pr-w { font-size: clamp(10px, 2.3vw, 12px); font-weight: 800; color: var(--violet); min-width: clamp(48px, 14vw, 72px); white-space: nowrap; }
-    .pr-f { font-size: clamp(10px, 2.3vw, 13px); font-weight: 500; color: var(--t2); flex: 1; min-width: 0; }
-    .pr-r { font-size: clamp(9px, 2vw, 11px); font-weight: 800; padding: 3px 7px; border-radius: 100px; background: rgba(139,92,246,0.15); color: var(--violet); border: 1px solid rgba(139,92,246,0.25); white-space: nowrap; flex-shrink: 0; }
-    .pr.dl .pr-r { background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.25); }
+    .pl { display:flex; flex-direction:column; gap:5px; }
+    .pr { display:flex; align-items:center; gap:clamp(6px,2vw,12px); padding:clamp(7px,1.8vw,10px) clamp(8px,2vw,14px); background:rgba(255,255,255,0.03); border:1px solid var(--bdr); border-radius:var(--r-xs); }
+    .pr-w { font-size:clamp(10px,2.3vw,12px); font-weight:800; color:var(--violet); min-width:clamp(48px,14vw,72px); white-space:nowrap; }
+    .pr-f { font-size:clamp(10px,2.3vw,13px); font-weight:500; color:var(--t2); flex:1; min-width:0; }
+    .pr-r { font-size:clamp(9px,2vw,11px); font-weight:800; padding:3px 7px; border-radius:100px; background:rgba(139,92,246,0.15); color:var(--violet); border:1px solid rgba(139,92,246,0.25); white-space:nowrap; flex-shrink:0; }
+    .pr.dl .pr-r { background:rgba(16,185,129,0.15); color:var(--green); border-color:rgba(16,185,129,0.25); }
 
     /* ── BOTTOM NAV ── */
-    .bnav {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-      padding: 0 clamp(6px, 2vw, 14px) calc(var(--safe-b) + 6px);
-      background: rgba(10,10,15,0.88);
-      backdrop-filter: blur(28px) saturate(1.4);
-      -webkit-backdrop-filter: blur(28px) saturate(1.4);
-      border-top: 1px solid var(--bdr);
-    }
-    .bnav-in { display: flex; gap: 3px; padding-top: 6px; max-width: 600px; margin: 0 auto; }
-    .nb {
-      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
-      padding: clamp(5px, 1.5vw, 8px) 2px; background: transparent; border: none;
-      cursor: pointer; border-radius: var(--r-xs); transition: all 0.18s;
-      position: relative; -webkit-tap-highlight-color: transparent;
-    }
-    .nb::before { content: ''; position: absolute; inset: 0; border-radius: var(--r-xs); background: var(--day-color); opacity: 0; transition: opacity 0.18s; }
-    .nb.on::before { opacity: 0.14; }
-    .nb.on { box-shadow: 0 0 0 1px var(--day-color); }
-    .nb-e { position: relative; z-index: 1; font-size: clamp(16px, 4.5vw, 22px); line-height: 1; transition: transform 0.18s; }
-    .nb.on .nb-e { transform: scale(1.15) translateY(-1px); }
-    .nb:active .nb-e { transform: scale(0.88); }
-    .nb-l { position: relative; z-index: 1; font-size: clamp(7px, 1.8vw, 9px); font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--t3); transition: color 0.18s; }
-    .nb.on .nb-l { color: var(--day-color); }
-    .nb-dot { position: absolute; top: 3px; right: clamp(4px, 1.5vw, 12px); z-index: 2; width: 5px; height: 5px; border-radius: 50%; background: var(--day-color); box-shadow: 0 0 5px var(--day-color); animation: pdot 2s infinite; }
+    .bnav { position:fixed; bottom:0; left:0; right:0; z-index:200; padding:0 clamp(6px,2vw,14px) calc(var(--safe-b)+6px); background:rgba(10,10,15,0.88); backdrop-filter:blur(28px) saturate(1.4); -webkit-backdrop-filter:blur(28px) saturate(1.4); border-top:1px solid var(--bdr); }
+    .bnav-in { display:flex; gap:3px; padding-top:6px; max-width:600px; margin:0 auto; }
+    .nb { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:clamp(5px,1.5vw,8px) 2px; background:transparent; border:none; cursor:pointer; border-radius:var(--r-xs); transition:all 0.18s; position:relative; -webkit-tap-highlight-color:transparent; }
+    .nb::before { content:''; position:absolute; inset:0; border-radius:var(--r-xs); background:var(--dc); opacity:0; transition:opacity 0.18s; }
+    .nb.on::before { opacity:0.14; }
+    .nb.on { box-shadow:0 0 0 1px var(--dc); }
+    .nb.on .nb-e { transform:scale(1.15) translateY(-1px); }
+    .nb:active .nb-e { transform:scale(0.88); }
+    .nb-l { position:relative; z-index:1; font-size:clamp(7px,1.8vw,9px); font-weight:800; letter-spacing:0.05em; text-transform:uppercase; color:var(--t3); transition:color 0.18s; }
+    .nb.on .nb-l { color:var(--dc); }
+    .nb-dot { position:absolute; top:3px; right:clamp(4px,1.5vw,12px); z-index:2; width:5px; height:5px; border-radius:50%; background:var(--dc); box-shadow:0 0 5px var(--dc); animation:pdot 2s infinite; }
 
     /* ── FAB ── */
-    .fab {
-      position: fixed; right: clamp(10px, 3vw, 20px); bottom: calc(var(--nav-h) + var(--safe-b) + 10px);
-      z-index: 150; width: 38px; height: 38px; border-radius: 50%;
-      background: var(--card); border: 1px solid var(--bdr2);
-      backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center;
-      font-size: 14px; cursor: pointer; opacity: 0; pointer-events: none;
-      transform: translateY(10px); transition: all 0.25s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .fab.vis { opacity: 1; pointer-events: all; transform: translateY(0); }
-    .fab:active { transform: scale(0.88); }
+    .fab { position:fixed; right:clamp(10px,3vw,20px); bottom:calc(var(--nav-h)+var(--safe-b)+10px); z-index:150; width:38px; height:38px; border-radius:50%; background:var(--card); border:1px solid var(--bdr2); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; pointer-events:none; transform:translateY(10px); transition:all 0.25s; -webkit-tap-highlight-color:transparent; color:var(--t2); }
+    .fab svg { width:16px; height:16px; }
+    .fab.vis { opacity:1; pointer-events:all; transform:translateY(0); }
+    .fab:active { transform:scale(0.88); }
 
-    .swh { text-align: center; padding: 10px 0 0; font-size: clamp(9px, 2vw, 11px); font-weight: 500; color: var(--t3); letter-spacing: 0.05em; opacity: 0.5; }
+    .swh { text-align:center; padding:10px 0 0; font-size:clamp(9px,2vw,11px); font-weight:500; color:var(--t3); letter-spacing:0.05em; opacity:0.5; }
 
-    @keyframes fdDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fdDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
 
-    /* ══════════════════════════════
-       BREAKPOINTS — TRULY ADAPTIVE
-    ══════════════════════════════ */
-
-    /* ── ≥480 : wider phones / small tablets ── */
-    @media (min-width: 480px) {
-      .exc-bgs { gap: 5px; }
-      .rl { display: grid; grid-template-columns: 1fr 1fr; }
-      .vl { display: grid; grid-template-columns: 1fr 1fr; }
-    }
-
-    /* ── ≥680 : tablets ── */
-    @media (min-width: 680px) {
-      .scroll { padding-bottom: calc(var(--nav-h) + var(--safe-b) + 24px); }
-      .rl { grid-template-columns: 1fr 1fr 1fr; }
-      .vl { grid-template-columns: 1fr 1fr 1fr; }
-      .exl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    }
-
-    /* ── ≥900 : desktop ── */
-    @media (min-width: 900px) {
-      :root { --nav-h: 0px; }
-      .bnav { display: none; }
-      .fab { bottom: 24px; }
-      .scroll { padding-bottom: 40px; }
-      .strip-w { position: static; border-bottom: none; background: transparent; backdrop-filter: none; }
-      .strip { max-width: 900px; margin: 0 auto; padding: 14px 24px; gap: 10px; justify-content: center; }
-      .dchip { flex: 0 1 auto; min-width: 80px; padding: 10px 18px; transition: all 0.2s, transform 0.2s; }
-      .dchip:hover:not(.on) { transform: translateY(-2px); background: var(--card-h); }
-      .topbar { justify-content: center; }
-      .top-l { flex: none; }
-      .topbar { padding-left: 32px; padding-right: 32px; gap: 20px; }
-      .content { max-width: 900px; }
-      .exl { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .exc:hover { transform: translateX(4px) translateY(-1px); }
-    }
-
-    /* ── ≥1200 : large desktop ── */
-    @media (min-width: 1200px) {
-      .content { max-width: 1000px; }
-      .exl { grid-template-columns: 1fr 1fr; gap: 12px; }
-      body { background: #050508; }
-      body::after { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(139,92,246,0.04) 0%, transparent 70%); pointer-events: none; z-index: 0; }
-    }
-
-    /* ── ≤359 : tiny phones ── */
-    @media (max-width: 359px) {
-      .exc-bgs { display: none; }
-      .exc-n { white-space: normal; }
-      .dchip-s { font-size: 7px; }
-      .lopt { padding: 4px 7px; font-size: 9px; }
-    }
+    /* ── BREAKPOINTS ── */
+    @media (min-width:480px) { .exc-bgs{gap:5px} .rl{display:grid;grid-template-columns:1fr 1fr} .vl{display:grid;grid-template-columns:1fr 1fr} }
+    @media (min-width:680px) { .scroll{padding-bottom:calc(var(--nav-h)+var(--safe-b)+24px)} .rl{grid-template-columns:1fr 1fr 1fr} .vl{grid-template-columns:1fr 1fr 1fr} .exl{display:grid;grid-template-columns:1fr 1fr;gap:8px} }
+    @media (min-width:900px) { :root{--nav-h:0px} .bnav{display:none} .fab{bottom:24px} .scroll{padding-bottom:40px} .strip-w{position:static;border-bottom:none;background:transparent;backdrop-filter:none} .strip{max-width:900px;margin:0 auto;padding:14px 24px;gap:10px;justify-content:center} .dchip{flex:0 1 auto;min-width:80px;padding:10px 18px;transition:all 0.2s,transform 0.2s} .dchip:hover:not(.on){transform:translateY(-2px);background:var(--card-h)} .topbar{justify-content:center} .top-l{flex:none} .topbar{padding-left:32px;padding-right:32px;gap:20px} .content{max-width:900px} .exl{grid-template-columns:1fr 1fr;gap:10px} .exc:hover{transform:translateX(4px) translateY(-1px)} }
+    @media (min-width:1200px) { .content{max-width:1000px} }
+    @media (max-width:359px) { .exc-bgs{display:none} .exc-n{white-space:normal} .dchip-s{font-size:7px} .lopt{padding:4px 7px;font-size:9px} }
   </style>
 </head>
 <body>
-
-<div class="amb"><div class="amb-1"></div><div class="amb-2"></div><div class="amb-d" id="ambD"></div></div>
-
+<div class="amb"><canvas id="ambCanvas"></canvas></div>
 <div class="app">
-
   <div class="topbar">
     <div class="top-l">
-      <div class="top-badge" id="tBadge">🏋️ Programme</div>
-      <div class="top-title" id="tTitle">Plan d'Entraînement</div>
+      <div class="top-badge"><span class="ico" id="tIco"></span><span id="tBadge">Programme</span></div>
+      <div class="top-title" id="tTitle">Plan d'Entrainement</div>
     </div>
     <div class="lpill" id="lPill">
       <div class="lpill-sl" id="lSl"></div>
-      <div class="lopt active" id="oFR"><span class="lfl">🇫🇷</span>FR</div>
-      <div class="lopt" id="oEN"><span class="lfl">🇬🇧</span>EN</div>
+      <div class="lopt active" id="oFR">FR</div>
+      <div class="lopt" id="oEN">EN</div>
     </div>
   </div>
-
   <div class="strip-w"><div class="strip" id="strip"></div></div>
-
   <div class="scroll" id="scroll">
     <div class="content" id="cWrap"></div>
-    <div class="swh" id="swh">← Swipe ou tap pour changer de jour →</div>
+    <div class="swh" id="swh"></div>
   </div>
-
   <nav class="bnav"><div class="bnav-in" id="bNav"></div></nav>
 </div>
-
-<div class="fab" id="fab">⬆️</div>
+<div class="fab" id="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg></div>
 
 <script>
+/* ── SVG ICON LIBRARY ── */
+const S = {
+  dumbbell: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="9" width="4" height="6" rx="1"/><rect x="18" y="9" width="4" height="6" rx="1"/><path d="M6 12h12"/><rect x="6" y="10" width="2" height="4" rx=".5"/><rect x="16" y="10" width="2" height="4" rx=".5"/></svg>`,
+  chest: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4C8 4 4 6 4 10c0 3 2 5 4 6l2 2h4l2-2c2-1 4-3 4-6 0-4-4-6-8-6z"/><path d="M12 4v8"/><path d="M8 8c1.5 1 2.5 2 4 2s2.5-1 4-2"/></svg>`,
+  back: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-3 0-5 2-6 5s-1 7 0 9c1 3 3 5 6 6 3-1 5-3 6-6 1-2 1-6 0-9S15 2 12 2z"/><path d="M12 2v20"/><path d="M7 7c1.5 1.5 3 2 5 2s3.5-.5 5-2"/><path d="M7 14c1.5-1 3-1.5 5-1.5s3.5.5 5 1.5"/></svg>`,
+  shoulders: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 5V3m0 18v-2M5 12H3m18 0h-2M7.05 7.05 5.63 5.63m12.73 12.73-1.41-1.41M7.05 16.95l-1.42 1.41M18.36 5.64l-1.41 1.41"/></svg>`,
+  arms: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V10c0-2 1-4 3-5l2-1"/><path d="M7 14c-2 0-3-1-3-3s1-3 3-3"/><path d="M17 20V10c0-2-1-4-3-5l-2-1"/><path d="M17 14c2 0 3-1 3-3s-1-3-3-3"/><circle cx="12" cy="4" r="1.5"/></svg>`,
+  quads: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4c0 2-1 4-2 6l-1 4c0 2 0 4 1 6h2"/><path d="M16 2v4c0 2 1 4 2 6l1 4c0 2 0 4-1 6h-2"/><path d="M8 2h8M10 8h4M9 14h6"/></svg>`,
+  glutes: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9c0-3 2.7-5 6-5s6 2 6 5"/><path d="M4 14c0 4 3.5 7 8 7s8-3 8-7"/><path d="M4 14c0-2 1-3.5 2-4.5M20 14c0-2-1-3.5-2-4.5"/><path d="M12 9v12"/><path d="M8 12c1 1 2.5 1.5 4 1.5s3-.5 4-1.5"/></svg>`,
+  clock: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  list: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="5" cy="6" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="18" r="1"/></svg>`,
+  flame: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c.5 4-2 6-2 10a4 4 0 0 0 8 0c0-4-2.5-6-2-10"/><path d="M12 18a2 2 0 0 1-2-2c0-2 2-3 2-5 0 2 2 3 2 5a2 2 0 0 1-2 2z"/></svg>`,
+  drop: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-4 5-7 8-7 12a7 7 0 0 0 14 0c0-4-3-7-7-12z"/></svg>`,
+  key: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="5"/><path d="M11.3 11.7 21 2"/><path d="M16 7l3-3"/><path d="M18 4l2 2"/></svg>`,
+  chart: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 5-8"/></svg>`,
+  bulb: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>`,
+  grip: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><path d="M6 4v16M10 4v16M14 4v16M18 4v16"/><path d="M4 8h16M4 16h16"/></svg>`,
+  note: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>`,
+  meat: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="10" rx="8" ry="6"/><path d="M8 16c-2 2-2 4 0 5s4 0 4-2"/><path d="M16 16c2 2 2 4 0 5s-4 0-4-2"/></svg>`,
+  moon: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  water: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-4 5-7 8-7 12a7 7 0 0 0 14 0c0-4-3-7-7-12z"/></svg>`,
+  trend: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>`,
+  pause: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,
+  ball: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg>`,
+  rotate: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
+  hand: c=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v1"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 0 1 4 0v6a8 8 0 0 1-8 8h-2c-2.5 0-4-.5-6-3l-2.7-2.7a2 2 0 0 1 2.8-2.8L8 16"/></svg>`,
+};
+const DI=['chest','back','shoulders','arms','quads','glutes'];
+function dIcon(i,c){return S[DI[i]](c)}
+
+/* ── SECTION ICON MAP ── */
+function secIcon(key,c){
+  const m={'Pectoraux':'chest','Chest':'chest','Dos':'back','Back':'back','Epaules':'shoulders','Shoulders':'shoulders',
+    'Biceps':'arms','Triceps':'arms','Avant-bras':'grip','Forearms':'grip','Abdos':'flame','Abs':'flame',
+    'Quadriceps':'quads','Quads':'quads','Mollets':'quads','Calves':'quads',
+    'Ischio-jambiers':'glutes','Hamstrings':'glutes','Fessiers':'glutes','Glutes':'glutes'};
+  for(const[k,v] of Object.entries(m)) if(key.includes(k)) return S[v](c);
+  return S.dumbbell(c);
+}
+
+/* ── EXERCISE ICON MAP ── */
+function exIcon(c){return S.dumbbell(c)}
+
+/* ── DATA ── */
 const D={
-fr:{
-badge:'🏋️ Programme',title:"Plan d'Entraînement",today:"Aujourd'hui",
-swh:'← Swipe ou tap pour changer de jour →',
-S:'Séries',R:'Reps',Re:'Repos',ex:n=>`${n} exercices`,
-finT:'Finisher — 2 min',
-vT:'💉 Vascularité Quotidienne',vS:'5 min à la maison',
-rT:'🔑 Règles d\'Or', pT:'📊 Périodisation · 8 semaines',
+fr:{badge:'Programme',title:"Plan d'Entrainement",today:"Aujourd'hui",swh:'Swipe ou tap pour changer de jour',S:'Series',R:'Reps',Re:'Repos',ex:n=>`${n} exercices`,finT:'Finisher - 2 min',vT:'Vascularite Quotidienne',vS:'5 min a la maison',rT:'Regles d\'Or',pT:'Periodisation - 8 semaines',
 days:[
-{l:'Lundi',s:'LUN',e:'🔴',c:'#EC4899',a:'rgba(236,72,153,0.18)',m:'Pectoraux + Avant-bras',d:'1h',
-sec:[{t:'Pectoraux',i:'💪',tm:'45 min',ex:[
-{i:'📐',n:'Développé incliné haltères',s:'4',r:'6-8',re:'2min',tip:'Tempo 3-1-1'},
-{i:'🏋️',n:'Développé couché barre',s:'4',r:'8-10',re:'90s',tip:'Descente contrôlée'},
-{i:'🔀',n:'Écarté poulie vis-à-vis',s:'3',r:'12-15',re:'60s',tip:'Croiser les mains'},
-{i:'📐',n:'Écarté incliné haltères',s:'3',r:'12-15',re:'60s',tip:'Étirement profond'},
-{i:'⬇️',n:'Pompes dropset',s:'2',r:'Max',re:'45s',tip:'Pieds surélevés → sol → genoux'}]},
-{t:'Avant-bras',i:'💉',tm:'15 min',ex:[
-{i:'🔨',n:'Curl marteau lourd',s:'3',r:'10-12',re:'60s',tip:'Descente 3 sec'},
-{i:'🖐️',n:'Wrist curl (sur banc)',s:'3',r:'20',re:'45s',tip:'Squeeze en haut'},
-{i:'🧗',n:'Dead hang',s:'2',r:'Max',re:'45s',tip:'Congestion'}]}]},
-{l:'Mardi',s:'MAR',e:'🟠',c:'#F97316',a:'rgba(249,115,22,0.18)',m:'Dos + Avant-bras',d:'1h',
-sec:[{t:'Dos',i:'🦅',tm:'45 min',ex:[
-{i:'🏅',n:'Tractions (lestées si possible)',s:'4',r:'6-8',re:'2min',tip:'Prise large'},
-{i:'🏋️',n:'Rowing barre penché',s:'4',r:'8-10',re:'90s',tip:'Tirer vers nombril'},
-{i:'⬇️',n:'Tirage poulie haute (neutre)',s:'3',r:'10-12',re:'60s',tip:'Squeeze omoplates'},
-{i:'💪',n:'Rowing haltère un bras',s:'3',r:'10-12',re:'60s',tip:'Étirement complet'},
-{i:'🔃',n:'Hyperextensions',s:'3',r:'15',re:'60s',tip:'Disque sur poitrine'}]},
-{t:'Avant-bras',i:'💉',tm:'15 min',ex:[
-{i:'🔄',n:'Reverse curl barre EZ',s:'3',r:'12-15',re:'60s',tip:'Pronation stricte'},
-{i:'🧳',n:"Farmer's walk",s:'3',r:'30sec',re:'60s',tip:'Le plus lourd possible'},
-{i:'✊',n:'Gripper / serrer balle',s:'2',r:'50/main',re:'30s',tip:'Congestion max'}]}]},
-{l:'Mercredi',s:'MER',e:'🟡',c:'#F59E0B',a:'rgba(245,158,11,0.18)',m:'Épaules + Abdos',d:'1h',
-sec:[{t:'Épaules',i:'🦾',tm:'45 min',ex:[
-{i:'🏋️',n:'Développé militaire debout',s:'4',r:'6-8',re:'2min',tip:'Strict'},
-{i:'↔️',n:'Élévations latérales haltères',s:'4',r:'12-15',re:'60s',tip:'Pouce vers le bas'},
-{i:'🦜',n:'Oiseau haltères penché',s:'3',r:'12-15',re:'60s',tip:'Squeeze 2 sec'},
-{i:'🎯',n:'Face pulls',s:'3',r:'15-20',re:'45s',tip:'Rotation externe'},
-{i:'⬆️',n:'Shrugs haltères',s:'3',r:'12-15',re:'60s',tip:'Tenir 3 sec en haut'}]},
-{t:'Abdos',i:'🔥',tm:'15 min',ex:[
-{i:'🔗',n:'Crunch poulie haute',s:'3',r:'15-20',re:'45s',tip:''},
-{i:'🦵',n:'Relevé de jambes suspendu',s:'3',r:'12-15',re:'45s',tip:''},
-{i:'⏱️',n:'Gainage planche',s:'2',r:'45sec',re:'30s',tip:''}]}]},
-{l:'Jeudi',s:'JEU',e:'🟢',c:'#10B981',a:'rgba(16,185,129,0.18)',m:'Bras + Avant-bras',d:'1h',
-sec:[{t:'Biceps',i:'💪',tm:'20 min',ex:[
-{i:'🏋️',n:'Curl barre EZ',s:'3',r:'8-10',re:'90s',tip:'Strict'},
-{i:'📐',n:'Curl incliné haltères',s:'3',r:'10-12',re:'60s',tip:'Étirement max'},
-{i:'🎯',n:'Curl concentré',s:'2',r:'12-15',re:'45s',tip:'Squeeze 3 sec'}]},
-{t:'Triceps',i:'🔱',tm:'20 min',ex:[
-{i:'⬇️',n:'Dips (lestés si possible)',s:'3',r:'8-10',re:'90s',tip:'Buste droit'},
-{i:'🧠',n:'Barre au front',s:'3',r:'10-12',re:'60s',tip:'Derrière la tête'},
-{i:'🔗',n:'Extensions poulie corde',s:'3',r:'12-15',re:'45s',tip:'Écarter en bas'}]},
-{t:'Avant-bras — Vascularité',i:'💉',tm:'20 min',ex:[
-{i:'🔄',n:'Reverse curl léger',s:'3',r:'20',re:'30s',tip:'Pompe maximale'},
-{i:'🖐️',n:'Wrist curl',s:'3',r:'25',re:'30s',tip:'Séries longues'},
-{i:'↩️',n:'Reverse wrist curl',s:'2',r:'25',re:'30s',tip:'Léger'},
-{i:'🔗',n:'Curl marteau corde poulie',s:'2',r:'20',re:'30s',tip:'Congestion'}]}],
-fin:'Serrer balle 100 reps → Dead hang max → Veines qui explosent 💥'},
-{l:'Vendredi',s:'VEN',e:'🔵',c:'#3B82F6',a:'rgba(59,130,246,0.18)',m:'Quadriceps + Mollets',d:'1h',
-sec:[{t:'Quadriceps',i:'🦵',tm:'40 min',ex:[
-{i:'🏋️',n:'Squat barre',s:'4',r:'6-8',re:'2m30',tip:'Parallèle minimum'},
-{i:'🦾',n:'Presse à cuisses',s:'4',r:'10-12',re:'90s',tip:'Pieds bas et serrés'},
-{i:'🚶',n:'Fentes marchées',s:'3',r:'10/jambe',re:'60s',tip:'Pas court'},
-{i:'🔗',n:'Leg extension',s:'3',r:'15',re:'60s',tip:'Squeeze 2 sec'}]},
-{t:'Mollets',i:'⚡',tm:'20 min',ex:[
-{i:'⬆️',n:'Mollets debout',s:'4',r:'12',re:'60s',tip:'Pause 2 sec en bas'},
-{i:'🪑',n:'Mollets assis',s:'3',r:'20',re:'45s',tip:'Squeeze en haut'},
-{i:'🦶',n:'Mollets un pied',s:'2',r:'25',re:'30s',tip:'Brûlure totale'}]}]},
-{l:'Samedi',s:'SAM',e:'🟣',c:'#8B5CF6',a:'rgba(139,92,246,0.18)',m:'Ischio + Fessiers + Abdos',d:'1h',
-sec:[{t:'Ischio-jambiers',i:'🦿',tm:'25 min',ex:[
-{i:'🏋️',n:'Soulevé de terre roumain',s:'4',r:'8-10',re:'2min',tip:'Étirement ischios'},
-{i:'🔗',n:'Leg curl allongé',s:'3',r:'12',re:'60s',tip:'Squeeze en haut'},
-{i:'🌅',n:'Good mornings',s:'3',r:'12',re:'60s',tip:'Dos droit'}]},
-{t:'Fessiers',i:'🍑',tm:'20 min',ex:[
-{i:'🦁',n:'Hip thrust',s:'4',r:'10-12',re:'90s',tip:'Squeeze 3 sec'},
-{i:'🧗',n:'Fentes bulgares',s:'3',r:'10/jambe',re:'60s',tip:'Descendre bas'},
-{i:'🦵',n:'Kickback poulie',s:'2',r:'15',re:'45s',tip:'Grand fessier'}]},
-{t:'Abdos',i:'🔥',tm:'15 min',ex:[
-{i:'⚙️',n:'Ab wheel',s:'3',r:'10-12',re:'45s',tip:''},
-{i:'🌀',n:'Russian twist',s:'3',r:'20',re:'30s',tip:''},
-{i:'🔃',n:'Crunch inversé',s:'3',r:'15',re:'45s',tip:''}]}]}],
-vascu:[{i:'🎾',n:'Serrer balle tennis',r:'100/main'},{i:'🔄',n:'Rotation poignets haltère léger',r:'30s/sens'},{i:'🖐️',n:'Extension doigts élastique',r:'50 reps'}],
-rules:[{i:'📓',b:'Note tout',d:'— poids, reps, sensations'},{i:'🥩',b:'Protéines',d:'— 1.8-2.2g/kg/jour'},{i:'😴',b:'Sommeil',d:'— 7-9h minimum'},{i:'💧',b:'Eau',d:'— 3-4 litres/jour'},{i:'📉',b:'Bodyfat',d:'— Sous 12-13% pour les veines'},{i:'🏳️',b:'Deload semaine 7',d:'— Obligatoire !'}],
-perio:[{w:'Sem. 1-2',f:'Apprentissage du tempo',r:'RPE 7',dl:false},{w:'Sem. 3-4',f:'Montée en charge',r:'RPE 8',dl:false},{w:'Sem. 5-6',f:'Intensification + dropsets',r:'RPE 9',dl:false},{w:'Sem. 7',f:'DELOAD — -40% volume',r:'RPE 5',dl:true},{w:'Sem. 8',f:'Nouveau cycle (+2.5-5%)',r:'RPE 7',dl:false}]
-},
-en:{
-badge:'🏋️ Weekly Program',title:'Training Plan',today:'Today',
-swh:'← Swipe or tap to change day →',
-S:'Sets',R:'Reps',Re:'Rest',ex:n=>`${n} exercises`,
-finT:'Finisher — 2 min',
-vT:'💉 Daily Vascularity',vS:'5 min at home',
-rT:'🔑 Golden Rules',pT:'📊 Periodization · 8 weeks',
+{l:'Lundi',s:'LUN',c:'#EC4899',a:'rgba(236,72,153,0.18)',m:'Pectoraux + Avant-bras',d:'1h',sec:[
+{t:'Pectoraux',tm:'45 min',ex:[{n:'Developpe incline halteres',s:'4',r:'6-8',re:'2min',tip:'Tempo 3-1-1'},{n:'Developpe couche barre',s:'4',r:'8-10',re:'90s',tip:'Descente controlee'},{n:'Ecarte poulie vis-a-vis',s:'3',r:'12-15',re:'60s',tip:'Croiser les mains'},{n:'Ecarte incline halteres',s:'3',r:'12-15',re:'60s',tip:'Etirement profond'},{n:'Pompes dropset',s:'2',r:'Max',re:'45s',tip:'Pieds sureleves > sol > genoux'}]},
+{t:'Avant-bras',tm:'15 min',ex:[{n:'Curl marteau lourd',s:'3',r:'10-12',re:'60s',tip:'Descente 3 sec'},{n:'Wrist curl (sur banc)',s:'3',r:'20',re:'45s',tip:'Squeeze en haut'},{n:'Dead hang',s:'2',r:'Max',re:'45s',tip:'Congestion'}]}]},
+{l:'Mardi',s:'MAR',c:'#F97316',a:'rgba(249,115,22,0.18)',m:'Dos + Avant-bras',d:'1h',sec:[
+{t:'Dos',tm:'45 min',ex:[{n:'Tractions (lestees si possible)',s:'4',r:'6-8',re:'2min',tip:'Prise large'},{n:'Rowing barre penche',s:'4',r:'8-10',re:'90s',tip:'Tirer vers nombril'},{n:'Tirage poulie haute (neutre)',s:'3',r:'10-12',re:'60s',tip:'Squeeze omoplates'},{n:'Rowing haltere un bras',s:'3',r:'10-12',re:'60s',tip:'Etirement complet'},{n:'Hyperextensions',s:'3',r:'15',re:'60s',tip:'Disque sur poitrine'}]},
+{t:'Avant-bras',tm:'15 min',ex:[{n:'Reverse curl barre EZ',s:'3',r:'12-15',re:'60s',tip:'Pronation stricte'},{n:"Farmer's walk",s:'3',r:'30sec',re:'60s',tip:'Le plus lourd possible'},{n:'Gripper / serrer balle',s:'2',r:'50/main',re:'30s',tip:'Congestion max'}]}]},
+{l:'Mercredi',s:'MER',c:'#F59E0B',a:'rgba(245,158,11,0.18)',m:'Epaules + Abdos',d:'1h',sec:[
+{t:'Epaules',tm:'45 min',ex:[{n:'Developpe militaire debout',s:'4',r:'6-8',re:'2min',tip:'Strict'},{n:'Elevations laterales halteres',s:'4',r:'12-15',re:'60s',tip:'Pouce vers le bas'},{n:'Oiseau halteres penche',s:'3',r:'12-15',re:'60s',tip:'Squeeze 2 sec'},{n:'Face pulls',s:'3',r:'15-20',re:'45s',tip:'Rotation externe'},{n:'Shrugs halteres',s:'3',r:'12-15',re:'60s',tip:'Tenir 3 sec en haut'}]},
+{t:'Abdos',tm:'15 min',ex:[{n:'Crunch poulie haute',s:'3',r:'15-20',re:'45s',tip:''},{n:'Releve de jambes suspendu',s:'3',r:'12-15',re:'45s',tip:''},{n:'Gainage planche',s:'2',r:'45sec',re:'30s',tip:''}]}]},
+{l:'Jeudi',s:'JEU',c:'#10B981',a:'rgba(16,185,129,0.18)',m:'Bras + Avant-bras',d:'1h',sec:[
+{t:'Biceps',tm:'20 min',ex:[{n:'Curl barre EZ',s:'3',r:'8-10',re:'90s',tip:'Strict'},{n:'Curl incline halteres',s:'3',r:'10-12',re:'60s',tip:'Etirement max'},{n:'Curl concentre',s:'2',r:'12-15',re:'45s',tip:'Squeeze 3 sec'}]},
+{t:'Triceps',tm:'20 min',ex:[{n:'Dips (lestes si possible)',s:'3',r:'8-10',re:'90s',tip:'Buste droit'},{n:'Barre au front',s:'3',r:'10-12',re:'60s',tip:'Derriere la tete'},{n:'Extensions poulie corde',s:'3',r:'12-15',re:'45s',tip:'Ecarter en bas'}]},
+{t:'Avant-bras - Vascularite',tm:'20 min',ex:[{n:'Reverse curl leger',s:'3',r:'20',re:'30s',tip:'Pompe maximale'},{n:'Wrist curl',s:'3',r:'25',re:'30s',tip:'Series longues'},{n:'Reverse wrist curl',s:'2',r:'25',re:'30s',tip:'Leger'},{n:'Curl marteau corde poulie',s:'2',r:'20',re:'30s',tip:'Congestion'}]}],
+fin:'Serrer balle 100 reps > Dead hang max > Veines qui explosent'},
+{l:'Vendredi',s:'VEN',c:'#3B82F6',a:'rgba(59,130,246,0.18)',m:'Quadriceps + Mollets',d:'1h',sec:[
+{t:'Quadriceps',tm:'40 min',ex:[{n:'Squat barre',s:'4',r:'6-8',re:'2m30',tip:'Parallele minimum'},{n:'Presse a cuisses',s:'4',r:'10-12',re:'90s',tip:'Pieds bas et serres'},{n:'Fentes marchees',s:'3',r:'10/jambe',re:'60s',tip:'Pas court'},{n:'Leg extension',s:'3',r:'15',re:'60s',tip:'Squeeze 2 sec'}]},
+{t:'Mollets',tm:'20 min',ex:[{n:'Mollets debout',s:'4',r:'12',re:'60s',tip:'Pause 2 sec en bas'},{n:'Mollets assis',s:'3',r:'20',re:'45s',tip:'Squeeze en haut'},{n:'Mollets un pied',s:'2',r:'25',re:'30s',tip:'Brulure totale'}]}]},
+{l:'Samedi',s:'SAM',c:'#8B5CF6',a:'rgba(139,92,246,0.18)',m:'Ischio + Fessiers + Abdos',d:'1h',sec:[
+{t:'Ischio-jambiers',tm:'25 min',ex:[{n:'Souleve de terre roumain',s:'4',r:'8-10',re:'2min',tip:'Etirement ischios'},{n:'Leg curl allonge',s:'3',r:'12',re:'60s',tip:'Squeeze en haut'},{n:'Good mornings',s:'3',r:'12',re:'60s',tip:'Dos droit'}]},
+{t:'Fessiers',tm:'20 min',ex:[{n:'Hip thrust',s:'4',r:'10-12',re:'90s',tip:'Squeeze 3 sec'},{n:'Fentes bulgares',s:'3',r:'10/jambe',re:'60s',tip:'Descendre bas'},{n:'Kickback poulie',s:'2',r:'15',re:'45s',tip:'Grand fessier'}]},
+{t:'Abdos',tm:'15 min',ex:[{n:'Ab wheel',s:'3',r:'10-12',re:'45s',tip:''},{n:'Russian twist',s:'3',r:'20',re:'30s',tip:''},{n:'Crunch inverse',s:'3',r:'15',re:'45s',tip:''}]}]}],
+vascu:[{n:'Serrer balle tennis',r:'100/main',ik:'ball'},{n:'Rotation poignets haltere leger',r:'30s/sens',ik:'rotate'},{n:'Extension doigts elastique',r:'50 reps',ik:'hand'}],
+rules:[{b:'Note tout',d:'poids, reps, sensations',ik:'note'},{b:'Proteines',d:'1.8-2.2g/kg/jour',ik:'meat'},{b:'Sommeil',d:'7-9h minimum',ik:'moon'},{b:'Eau',d:'3-4 litres/jour',ik:'water'},{b:'Bodyfat',d:'Sous 12-13% pour les veines',ik:'trend'},{b:'Deload semaine 7',d:'Obligatoire !',ik:'pause'}],
+perio:[{w:'Sem. 1-2',f:'Apprentissage du tempo',r:'RPE 7',dl:false},{w:'Sem. 3-4',f:'Montee en charge',r:'RPE 8',dl:false},{w:'Sem. 5-6',f:'Intensification + dropsets',r:'RPE 9',dl:false},{w:'Sem. 7',f:'DELOAD - -40% volume',r:'RPE 5',dl:true},{w:'Sem. 8',f:'Nouveau cycle (+2.5-5%)',r:'RPE 7',dl:false}]},
+en:{badge:'Weekly Program',title:'Training Plan',today:'Today',swh:'Swipe or tap to change day',S:'Sets',R:'Reps',Re:'Rest',ex:n=>`${n} exercises`,finT:'Finisher - 2 min',vT:'Daily Vascularity',vS:'5 min at home',rT:'Golden Rules',pT:'Periodization - 8 weeks',
 days:[
-{l:'Monday',s:'MON',e:'🔴',c:'#EC4899',a:'rgba(236,72,153,0.18)',m:'Chest + Forearms',d:'1h',
-sec:[{t:'Chest',i:'💪',tm:'45 min',ex:[
-{i:'📐',n:'Incline Dumbbell Press',s:'4',r:'6-8',re:'2min',tip:'Tempo 3-1-1'},
-{i:'🏋️',n:'Barbell Bench Press',s:'4',r:'8-10',re:'90s',tip:'Controlled descent'},
-{i:'🔀',n:'Cable Crossover',s:'3',r:'12-15',re:'60s',tip:'Cross hands over'},
-{i:'📐',n:'Incline Dumbbell Fly',s:'3',r:'12-15',re:'60s',tip:'Deep stretch'},
-{i:'⬇️',n:'Push-Up Dropset',s:'2',r:'Max',re:'45s',tip:'Feet elevated → flat → knees'}]},
-{t:'Forearms',i:'💉',tm:'15 min',ex:[
-{i:'🔨',n:'Heavy Hammer Curl',s:'3',r:'10-12',re:'60s',tip:'3 sec descent'},
-{i:'🖐️',n:'Wrist Curl (on bench)',s:'3',r:'20',re:'45s',tip:'Squeeze at top'},
-{i:'🧗',n:'Dead Hang',s:'2',r:'Max',re:'45s',tip:'Pump'}]}]},
-{l:'Tuesday',s:'TUE',e:'🟠',c:'#F97316',a:'rgba(249,115,22,0.18)',m:'Back + Forearms',d:'1h',
-sec:[{t:'Back',i:'🦅',tm:'45 min',ex:[
-{i:'🏅',n:'Pull-Up (weighted if possible)',s:'4',r:'6-8',re:'2min',tip:'Wide grip'},
-{i:'🏋️',n:'Bent Over Barbell Row',s:'4',r:'8-10',re:'90s',tip:'Pull to navel'},
-{i:'⬇️',n:'Lat Pulldown (neutral grip)',s:'3',r:'10-12',re:'60s',tip:'Squeeze shoulder blades'},
-{i:'💪',n:'One Arm Dumbbell Row',s:'3',r:'10-12',re:'60s',tip:'Full stretch'},
-{i:'🔃',n:'Back Extension',s:'3',r:'15',re:'60s',tip:'Plate on chest'}]},
-{t:'Forearms',i:'💉',tm:'15 min',ex:[
-{i:'🔄',n:'Reverse Curl (EZ Bar)',s:'3',r:'12-15',re:'60s',tip:'Strict pronation'},
-{i:'🧳',n:"Farmer's Walk",s:'3',r:'30sec',re:'60s',tip:'As heavy as possible'},
-{i:'✊',n:'Gripper / Ball Squeeze',s:'2',r:'50/hand',re:'30s',tip:'Max pump'}]}]},
-{l:'Wednesday',s:'WED',e:'🟡',c:'#F59E0B',a:'rgba(245,158,11,0.18)',m:'Shoulders + Abs',d:'1h',
-sec:[{t:'Shoulders',i:'🦾',tm:'45 min',ex:[
-{i:'🏋️',n:'Standing Overhead Press',s:'4',r:'6-8',re:'2min',tip:'Strict'},
-{i:'↔️',n:'Dumbbell Lateral Raise',s:'4',r:'12-15',re:'60s',tip:'Thumbs down'},
-{i:'🦜',n:'Bent Over Reverse Fly',s:'3',r:'12-15',re:'60s',tip:'Squeeze 2 sec'},
-{i:'🎯',n:'Face Pull',s:'3',r:'15-20',re:'45s',tip:'External rotation'},
-{i:'⬆️',n:'Dumbbell Shrug',s:'3',r:'12-15',re:'60s',tip:'Hold 3 sec at top'}]},
-{t:'Abs',i:'🔥',tm:'15 min',ex:[
-{i:'🔗',n:'Cable Crunch',s:'3',r:'15-20',re:'45s',tip:''},
-{i:'🦵',n:'Hanging Leg Raise',s:'3',r:'12-15',re:'45s',tip:''},
-{i:'⏱️',n:'Plank',s:'2',r:'45sec',re:'30s',tip:''}]}]},
-{l:'Thursday',s:'THU',e:'🟢',c:'#10B981',a:'rgba(16,185,129,0.18)',m:'Arms + Forearms',d:'1h',
-sec:[{t:'Biceps',i:'💪',tm:'20 min',ex:[
-{i:'🏋️',n:'EZ Bar Curl',s:'3',r:'8-10',re:'90s',tip:'Strict'},
-{i:'📐',n:'Incline Dumbbell Curl',s:'3',r:'10-12',re:'60s',tip:'Max stretch'},
-{i:'🎯',n:'Concentration Curl',s:'2',r:'12-15',re:'45s',tip:'Squeeze 3 sec'}]},
-{t:'Triceps',i:'🔱',tm:'20 min',ex:[
-{i:'⬇️',n:'Dip (weighted if possible)',s:'3',r:'8-10',re:'90s',tip:'Upright torso'},
-{i:'🧠',n:'Skull Crusher',s:'3',r:'10-12',re:'60s',tip:'Behind the head'},
-{i:'🔗',n:'Cable Rope Pushdown',s:'3',r:'12-15',re:'45s',tip:'Spread rope at bottom'}]},
-{t:'Forearms — Vascularity',i:'💉',tm:'20 min',ex:[
-{i:'🔄',n:'Light Reverse Curl',s:'3',r:'20',re:'30s',tip:'Maximum pump'},
-{i:'🖐️',n:'Wrist Curl',s:'3',r:'25',re:'30s',tip:'Long sets'},
-{i:'↩️',n:'Reverse Wrist Curl',s:'2',r:'25',re:'30s',tip:'Light'},
-{i:'🔗',n:'Cable Rope Hammer Curl',s:'2',r:'20',re:'30s',tip:'Pump'}]}],
-fin:'Ball Squeeze 100 reps → Dead Hang max → Veins explode 💥'},
-{l:'Friday',s:'FRI',e:'🔵',c:'#3B82F6',a:'rgba(59,130,246,0.18)',m:'Quads + Calves',d:'1h',
-sec:[{t:'Quads',i:'🦵',tm:'40 min',ex:[
-{i:'🏋️',n:'Barbell Back Squat',s:'4',r:'6-8',re:'2m30',tip:'Parallel minimum'},
-{i:'🦾',n:'Leg Press',s:'4',r:'10-12',re:'90s',tip:'Feet low and narrow'},
-{i:'🚶',n:'Walking Lunge',s:'3',r:'10/leg',re:'60s',tip:'Short steps'},
-{i:'🔗',n:'Leg Extension',s:'3',r:'15',re:'60s',tip:'Squeeze 2 sec'}]},
-{t:'Calves',i:'⚡',tm:'20 min',ex:[
-{i:'⬆️',n:'Standing Calf Raise',s:'4',r:'12',re:'60s',tip:'2 sec pause at bottom'},
-{i:'🪑',n:'Seated Calf Raise',s:'3',r:'20',re:'45s',tip:'Squeeze at top'},
-{i:'🦶',n:'Single Leg Calf Raise',s:'2',r:'25',re:'30s',tip:'Total burn'}]}]},
-{l:'Saturday',s:'SAT',e:'🟣',c:'#8B5CF6',a:'rgba(139,92,246,0.18)',m:'Hamstrings + Glutes + Abs',d:'1h',
-sec:[{t:'Hamstrings',i:'🦿',tm:'25 min',ex:[
-{i:'🏋️',n:'Romanian Deadlift (RDL)',s:'4',r:'8-10',re:'2min',tip:'Hamstring stretch'},
-{i:'🔗',n:'Lying Leg Curl',s:'3',r:'12',re:'60s',tip:'Squeeze at top'},
-{i:'🌅',n:'Good Morning',s:'3',r:'12',re:'60s',tip:'Straight back'}]},
-{t:'Glutes',i:'🍑',tm:'20 min',ex:[
-{i:'🦁',n:'Barbell Hip Thrust',s:'4',r:'10-12',re:'90s',tip:'Squeeze 3 sec'},
-{i:'🧗',n:'Bulgarian Split Squat',s:'3',r:'10/leg',re:'60s',tip:'Go deep'},
-{i:'🦵',n:'Cable Kickback',s:'2',r:'15',re:'45s',tip:'Glute max'}]},
-{t:'Abs',i:'🔥',tm:'15 min',ex:[
-{i:'⚙️',n:'Ab Wheel Rollout',s:'3',r:'10-12',re:'45s',tip:''},
-{i:'🌀',n:'Russian Twist',s:'3',r:'20',re:'30s',tip:''},
-{i:'🔃',n:'Reverse Crunch',s:'3',r:'15',re:'45s',tip:''}]}]}],
-vascu:[{i:'🎾',n:'Tennis Ball Squeeze',r:'100/hand'},{i:'🔄',n:'Wrist Rotation (light dumbbell)',r:'30s/dir'},{i:'🖐️',n:'Finger Extension (rubber band)',r:'50 reps'}],
-rules:[{i:'📓',b:'Log everything',d:'— weight, reps, feelings'},{i:'🥩',b:'Protein',d:'— 1.8-2.2g/kg/day'},{i:'😴',b:'Sleep',d:'— 7-9h minimum'},{i:'💧',b:'Water',d:'— 3-4 liters/day'},{i:'📉',b:'Bodyfat',d:'— Under 12-13% for veins'},{i:'🏳️',b:'Deload week 7',d:'— Mandatory!'}],
-perio:[{w:'Wk. 1-2',f:'Tempo learning',r:'RPE 7',dl:false},{w:'Wk. 3-4',f:'Load increase',r:'RPE 8',dl:false},{w:'Wk. 5-6',f:'Intensification + dropsets',r:'RPE 9',dl:false},{w:'Wk. 7',f:'DELOAD — -40% volume',r:'RPE 5',dl:true},{w:'Wk. 8',f:'New cycle (+2.5-5% load)',r:'RPE 7',dl:false}]
-}};
+{l:'Monday',s:'MON',c:'#EC4899',a:'rgba(236,72,153,0.18)',m:'Chest + Forearms',d:'1h',sec:[
+{t:'Chest',tm:'45 min',ex:[{n:'Incline Dumbbell Press',s:'4',r:'6-8',re:'2min',tip:'Tempo 3-1-1'},{n:'Barbell Bench Press',s:'4',r:'8-10',re:'90s',tip:'Controlled descent'},{n:'Cable Crossover',s:'3',r:'12-15',re:'60s',tip:'Cross hands over'},{n:'Incline Dumbbell Fly',s:'3',r:'12-15',re:'60s',tip:'Deep stretch'},{n:'Push-Up Dropset',s:'2',r:'Max',re:'45s',tip:'Feet elevated > flat > knees'}]},
+{t:'Forearms',tm:'15 min',ex:[{n:'Heavy Hammer Curl',s:'3',r:'10-12',re:'60s',tip:'3 sec descent'},{n:'Wrist Curl (on bench)',s:'3',r:'20',re:'45s',tip:'Squeeze at top'},{n:'Dead Hang',s:'2',r:'Max',re:'45s',tip:'Pump'}]}]},
+{l:'Tuesday',s:'TUE',c:'#F97316',a:'rgba(249,115,22,0.18)',m:'Back + Forearms',d:'1h',sec:[
+{t:'Back',tm:'45 min',ex:[{n:'Pull-Up (weighted if possible)',s:'4',r:'6-8',re:'2min',tip:'Wide grip'},{n:'Bent Over Barbell Row',s:'4',r:'8-10',re:'90s',tip:'Pull to navel'},{n:'Lat Pulldown (neutral grip)',s:'3',r:'10-12',re:'60s',tip:'Squeeze shoulder blades'},{n:'One Arm Dumbbell Row',s:'3',r:'10-12',re:'60s',tip:'Full stretch'},{n:'Back Extension',s:'3',r:'15',re:'60s',tip:'Plate on chest'}]},
+{t:'Forearms',tm:'15 min',ex:[{n:'Reverse Curl (EZ Bar)',s:'3',r:'12-15',re:'60s',tip:'Strict pronation'},{n:"Farmer's Walk",s:'3',r:'30sec',re:'60s',tip:'As heavy as possible'},{n:'Gripper / Ball Squeeze',s:'2',r:'50/hand',re:'30s',tip:'Max pump'}]}]},
+{l:'Wednesday',s:'WED',c:'#F59E0B',a:'rgba(245,158,11,0.18)',m:'Shoulders + Abs',d:'1h',sec:[
+{t:'Shoulders',tm:'45 min',ex:[{n:'Standing Overhead Press',s:'4',r:'6-8',re:'2min',tip:'Strict'},{n:'Dumbbell Lateral Raise',s:'4',r:'12-15',re:'60s',tip:'Thumbs down'},{n:'Bent Over Reverse Fly',s:'3',r:'12-15',re:'60s',tip:'Squeeze 2 sec'},{n:'Face Pull',s:'3',r:'15-20',re:'45s',tip:'External rotation'},{n:'Dumbbell Shrug',s:'3',r:'12-15',re:'60s',tip:'Hold 3 sec at top'}]},
+{t:'Abs',tm:'15 min',ex:[{n:'Cable Crunch',s:'3',r:'15-20',re:'45s',tip:''},{n:'Hanging Leg Raise',s:'3',r:'12-15',re:'45s',tip:''},{n:'Plank',s:'2',r:'45sec',re:'30s',tip:''}]}]},
+{l:'Thursday',s:'THU',c:'#10B981',a:'rgba(16,185,129,0.18)',m:'Arms + Forearms',d:'1h',sec:[
+{t:'Biceps',tm:'20 min',ex:[{n:'EZ Bar Curl',s:'3',r:'8-10',re:'90s',tip:'Strict'},{n:'Incline Dumbbell Curl',s:'3',r:'10-12',re:'60s',tip:'Max stretch'},{n:'Concentration Curl',s:'2',r:'12-15',re:'45s',tip:'Squeeze 3 sec'}]},
+{t:'Triceps',tm:'20 min',ex:[{n:'Dip (weighted if possible)',s:'3',r:'8-10',re:'90s',tip:'Upright torso'},{n:'Skull Crusher',s:'3',r:'10-12',re:'60s',tip:'Behind the head'},{n:'Cable Rope Pushdown',s:'3',r:'12-15',re:'45s',tip:'Spread rope at bottom'}]},
+{t:'Forearms - Vascularity',tm:'20 min',ex:[{n:'Light Reverse Curl',s:'3',r:'20',re:'30s',tip:'Maximum pump'},{n:'Wrist Curl',s:'3',r:'25',re:'30s',tip:'Long sets'},{n:'Reverse Wrist Curl',s:'2',r:'25',re:'30s',tip:'Light'},{n:'Cable Rope Hammer Curl',s:'2',r:'20',re:'30s',tip:'Pump'}]}],
+fin:'Ball Squeeze 100 reps > Dead Hang max > Veins explode'},
+{l:'Friday',s:'FRI',c:'#3B82F6',a:'rgba(59,130,246,0.18)',m:'Quads + Calves',d:'1h',sec:[
+{t:'Quads',tm:'40 min',ex:[{n:'Barbell Back Squat',s:'4',r:'6-8',re:'2m30',tip:'Parallel minimum'},{n:'Leg Press',s:'4',r:'10-12',re:'90s',tip:'Feet low and narrow'},{n:'Walking Lunge',s:'3',r:'10/leg',re:'60s',tip:'Short steps'},{n:'Leg Extension',s:'3',r:'15',re:'60s',tip:'Squeeze 2 sec'}]},
+{t:'Calves',tm:'20 min',ex:[{n:'Standing Calf Raise',s:'4',r:'12',re:'60s',tip:'2 sec pause at bottom'},{n:'Seated Calf Raise',s:'3',r:'20',re:'45s',tip:'Squeeze at top'},{n:'Single Leg Calf Raise',s:'2',r:'25',re:'30s',tip:'Total burn'}]}]},
+{l:'Saturday',s:'SAT',c:'#8B5CF6',a:'rgba(139,92,246,0.18)',m:'Hamstrings + Glutes + Abs',d:'1h',sec:[
+{t:'Hamstrings',tm:'25 min',ex:[{n:'Romanian Deadlift (RDL)',s:'4',r:'8-10',re:'2min',tip:'Hamstring stretch'},{n:'Lying Leg Curl',s:'3',r:'12',re:'60s',tip:'Squeeze at top'},{n:'Good Morning',s:'3',r:'12',re:'60s',tip:'Straight back'}]},
+{t:'Glutes',tm:'20 min',ex:[{n:'Barbell Hip Thrust',s:'4',r:'10-12',re:'90s',tip:'Squeeze 3 sec'},{n:'Bulgarian Split Squat',s:'3',r:'10/leg',re:'60s',tip:'Go deep'},{n:'Cable Kickback',s:'2',r:'15',re:'45s',tip:'Glute max'}]},
+{t:'Abs',tm:'15 min',ex:[{n:'Ab Wheel Rollout',s:'3',r:'10-12',re:'45s',tip:''},{n:'Russian Twist',s:'3',r:'20',re:'30s',tip:''},{n:'Reverse Crunch',s:'3',r:'15',re:'45s',tip:''}]}]}],
+vascu:[{n:'Tennis Ball Squeeze',r:'100/hand',ik:'ball'},{n:'Wrist Rotation (light dumbbell)',r:'30s/dir',ik:'rotate'},{n:'Finger Extension (rubber band)',r:'50 reps',ik:'hand'}],
+rules:[{b:'Log everything',d:'weight, reps, feelings',ik:'note'},{b:'Protein',d:'1.8-2.2g/kg/day',ik:'meat'},{b:'Sleep',d:'7-9h minimum',ik:'moon'},{b:'Water',d:'3-4 liters/day',ik:'water'},{b:'Bodyfat',d:'Under 12-13% for veins',ik:'trend'},{b:'Deload week 7',d:'Mandatory!',ik:'pause'}],
+perio:[{w:'Wk. 1-2',f:'Tempo learning',r:'RPE 7',dl:false},{w:'Wk. 3-4',f:'Load increase',r:'RPE 8',dl:false},{w:'Wk. 5-6',f:'Intensification + dropsets',r:'RPE 9',dl:false},{w:'Wk. 7',f:'DELOAD - -40% volume',r:'RPE 5',dl:true},{w:'Wk. 8',f:'New cycle (+2.5-5% load)',r:'RPE 7',dl:false}]}
+};
 
-let lang='fr', di=(()=>{const d=new Date().getDay();return d===0?5:d-1})();
-
+let lang='fr',di=(()=>{const d=new Date().getDay();return d===0?5:d-1})();
 const $=id=>document.getElementById(id);
 
-function setC(c,a){document.documentElement.style.setProperty('--day-color',c);document.documentElement.style.setProperty('--day-alpha',a);}
+function hToR(h){let m=h.match(/\w\w/g).map(x=>parseInt(x,16));return{r:m[0],g:m[1],b:m[2]};}
+function setC(c,a){document.documentElement.style.setProperty('--dc',c);document.documentElement.style.setProperty('--da',a);if(window.updOrbs)window.updOrbs(c);}
 
-function bStrip(){const s=$('strip');s.innerHTML='';D[lang].days.forEach((d,i)=>{const c=document.createElement('div');c.className='dchip'+(i===di?' on':'');c.style.setProperty('--day-color',d.c);c.innerHTML=`${i===di?`<div class="tdot"></div>`:''}<div class="dchip-e">${d.e}</div><div class="dchip-s">${d.s}</div>`;c.onclick=()=>go(i);s.appendChild(c);});}
+/* ── CANVAS BG ── */
+(function(){
+const cv=$('ambCanvas'),ctx=cv.getContext('2d');let W,H,orbs=[];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+addEventListener('resize',rs);rs();
 
-function bNav(){const n=$('bNav');n.innerHTML='';D[lang].days.forEach((d,i)=>{const b=document.createElement('button');b.className='nb'+(i===di?' on':'');b.style.setProperty('--day-color',d.c);b.innerHTML=`${i===di?`<div class="nb-dot"></div>`:''}<div class="nb-e">${d.e}</div><div class="nb-l">${d.s}</div>`;b.onclick=()=>go(i);n.appendChild(b);});}
+window.updOrbs=(hex)=>{
+  const base=hToR(hex);
+  if(orbs.length===0){
+    for(let i=0;i<12;i++)orbs.push({x:Math.random()*W,y:Math.random()*H,rx:120+Math.random()*220,ry:120+Math.random()*220,vx:(Math.random()-0.5)*2.5,vy:(Math.random()-0.5)*2.0,c:{...base},a:0.12+Math.random()*0.08,ph:Math.random()*6.28,sp:0.015+Math.random()*0.02,rot:Math.random()*6.28});
+  }else{
+    orbs.forEach(o=>{
+      o.targetC={
+        r:Math.max(0,Math.min(255,base.r+(Math.random()-0.5)*40)),
+        g:Math.max(0,Math.min(255,base.g+(Math.random()-0.5)*40)),
+        b:Math.max(0,Math.min(255,base.b+(Math.random()-0.5)*40))
+      };
+    });
+  }
+};
+
+const pts=[];for(let i=0;i<35;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:0.8+Math.random()*1.8,vx:(Math.random()-0.5)*0.12,vy:(Math.random()-0.5)*0.08,a:0.08+Math.random()*0.2,ph:Math.random()*6.28,tw:0.008+Math.random()*0.025});
+function draw(){
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,W,H);
+  for(const o of orbs){
+    if(o.targetC){o.c.r+=(o.targetC.r-o.c.r)*0.05;o.c.g+=(o.targetC.g-o.c.g)*0.05;o.c.b+=(o.targetC.b-o.c.b)*0.05;}
+    o.ph+=o.sp;o.rot+=0.008;o.x+=o.vx+Math.sin(o.ph)*2.5;o.y+=o.vy+Math.cos(o.ph*0.8)*2.0;
+    const maxR=Math.max(o.rx,o.ry)*1.5;
+    if(o.x<-maxR)o.x=W+maxR;if(o.x>W+maxR)o.x=-maxR;if(o.y<-maxR)o.y=H+maxR;if(o.y>H+maxR)o.y=-maxR;
+    const pulseX=o.rx*(1+Math.sin(o.ph*1.2)*0.4),pulseY=o.ry*(1+Math.cos(o.ph*0.9)*0.45);
+    ctx.save();ctx.translate(o.x,o.y);ctx.rotate(o.rot);
+    const g=ctx.createRadialGradient(0,0,0,0,0,Math.max(pulseX,pulseY));
+    g.addColorStop(0,`rgba(${Math.round(o.c.r)},${Math.round(o.c.g)},${Math.round(o.c.b)},${o.a})`);
+    g.addColorStop(1,`rgba(${Math.round(o.c.r)},${Math.round(o.c.g)},${Math.round(o.c.b)},0)`);
+    ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,pulseX,pulseY,0,0,6.28);ctx.fill();ctx.restore();
+  }
+  for(const p of pts){p.ph+=p.tw;p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;const a=p.a*(0.3+Math.sin(p.ph)*0.7);ctx.fillStyle=`rgba(255,255,255,${Math.max(0,a)})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fill();}
+  requestAnimationFrame(draw);
+}draw();
+})();
+
+/* ── SET TOPBAR ICON ── */
+$('tIco').innerHTML=S.dumbbell('var(--violet)');
+
+/* ── BUILD ── */
+function bStrip(){const s=$('strip');s.innerHTML='';D[lang].days.forEach((d,i)=>{const c=document.createElement('div');c.className='dchip'+(i===di?' on':'');c.style.setProperty('--dc',d.c);c.innerHTML=`${i===di?'<div class="tdot"></div>':''}<div class="dchip-e">${dIcon(i,d.c)}</div><div class="dchip-s">${d.s}</div>`;c.onclick=()=>go(i);s.appendChild(c);});}
+
+function bNav(){const n=$('bNav');n.innerHTML='';D[lang].days.forEach((d,i)=>{const b=document.createElement('button');b.className='nb'+(i===di?' on':'');b.style.setProperty('--dc',d.c);b.innerHTML=`${i===di?'<div class="nb-dot"></div>':''}<div class="nb-e">${dIcon(i,d.c)}</div><div class="nb-l">${d.s}</div>`;b.onclick=()=>go(i);n.appendChild(b);});}
 
 function bPanels(){const w=$('cWrap');w.innerHTML='';const L=D[lang];
 L.days.forEach((d,idx)=>{const p=document.createElement('div');p.className='pnl'+(idx===di?' on':'');p.id='p'+idx;
 const isT=idx===di,tot=d.sec.reduce((a,s)=>a+s.ex.length,0);
-p.innerHTML=`<div class="hero" style="--day-color:${d.c};--day-alpha:${d.a}"><div class="hero-glow"></div><div class="hero-top"><div class="hero-ico" style="box-shadow:0 0 16px ${d.a}">${d.e}</div><div class="hero-info"><h2>${d.l}</h2>${isT?`<div class="hero-today" style="--day-color:${d.c}">${L.today}</div>`:''}<div class="hero-muscle" style="color:${d.c}">${d.m}</div></div></div><div class="hero-chips"><div class="hero-chip">⏱️ ${d.d}</div><div class="hero-chip">📋 ${L.ex(tot)}</div></div></div>`;
+p.innerHTML=`<div class="hero" style="--dc:${d.c};--da:${d.a}"><div class="hero-glow"></div><div class="hero-top"><div class="hero-ico"><div class="hero-ico-ring"></div>${dIcon(idx,d.c)}</div><div class="hero-info"><h2>${d.l}</h2>${isT?`<div class="hero-today"><span class="dot-live"></span>${L.today}</div>`:''}<div class="hero-muscle" style="color:${d.c}">${d.m}</div></div></div><div class="hero-chips"><div class="hero-chip"><span class="ico">${S.clock(d.c)}</span>${d.d}</div><div class="hero-chip"><span class="ico">${S.list(d.c)}</span>${L.ex(tot)}</div></div></div>`;
 
 d.sec.forEach(sec=>{const se=document.createElement('div');let h='<div class="exl">';
-sec.ex.forEach(x=>{h+=`<div class="exc" style="--day-color:${d.c};--day-alpha:${d.a}"><div class="exc-i">${x.i}</div><div class="exc-b"><div class="exc-n">${x.n}</div>${x.tip?`<div class="exc-t">💡 ${x.tip}</div>`:''}</div><div class="exc-bgs"><div class="exc-bg"><span class="exc-bg-l">${L.S}</span><span class="exc-bg-v">${x.s}</span></div><div class="exc-bg"><span class="exc-bg-l">${L.R}</span><span class="exc-bg-v">${x.r}</span></div><div class="exc-bg"><span class="exc-bg-l">${L.Re}</span><span class="exc-bg-v">${x.re}</span></div></div></div>`;});
-h+='</div>';se.innerHTML=`<div class="sec-hd"><div class="sec-ico">${sec.i}</div><div class="sec-tt">${sec.t}</div><div class="sec-tm">${sec.tm}</div></div>${h}`;p.appendChild(se);});
+sec.ex.forEach(x=>{h+=`<div class="exc" style="--dc:${d.c};--da:${d.a}"><div class="exc-i">${exIcon(d.c)}</div><div class="exc-b"><div class="exc-n">${x.n}</div>${x.tip?`<div class="exc-t"><span class="ico">${S.bulb('#F59E0B')}</span>${x.tip}</div>`:''}</div><div class="exc-bgs"><div class="exc-bg"><span class="exc-bg-l">${L.S}</span><span class="exc-bg-v">${x.s}</span></div><div class="exc-bg"><span class="exc-bg-l">${L.R}</span><span class="exc-bg-v">${x.r}</span></div><div class="exc-bg"><span class="exc-bg-l">${L.Re}</span><span class="exc-bg-v">${x.re}</span></div></div></div>`;});
+h+='</div>';se.innerHTML=`<div class="sec-hd"><div class="sec-ico">${secIcon(sec.t,d.c)}</div><div class="sec-tt">${sec.t}</div><div class="sec-tm">${sec.tm}</div></div>${h}`;p.appendChild(se);});
 
-if(d.fin){const f=document.createElement('div');f.innerHTML=`<div class="fin"><div class="fin-ico">🔥</div><div class="fin-bd"><h4>${L.finT}</h4><p>${d.fin}</p></div></div>`;p.appendChild(f);}
+if(d.fin){const f=document.createElement('div');f.innerHTML=`<div class="fin"><div class="fin-ico">${S.flame('#F97316')}</div><div class="fin-bd"><h4>${L.finT}</h4><p>${d.fin}</p></div></div>`;p.appendChild(f);}
 
 const e=document.createElement('div');e.innerHTML=`
-<div class="bcard"><div class="bcard-tt" style="color:var(--cyan)">${L.vT} <span class="bcard-sub">${L.vS}</span></div><div class="vl">${L.vascu.map(v=>`<div class="vr"><div class="vr-i">${v.i}</div><div class="vr-n">${v.n}</div><div class="vr-r">${v.r}</div></div>`).join('')}</div></div>
-<div class="bcard"><div class="bcard-tt" style="color:var(--yellow)">${L.rT}</div><div class="rl">${L.rules.map(r=>`<div class="rr"><span class="rr-i">${r.i}</span><span class="rr-t"><strong>${r.b}</strong> ${r.d}</span></div>`).join('')}</div></div>
-<div class="bcard"><div class="bcard-tt" style="color:var(--violet)">${L.pT}</div><div class="pl">${L.perio.map(p=>`<div class="pr${p.dl?' dl':''}"><span class="pr-w">${p.w}</span><span class="pr-f">${p.f}</span><span class="pr-r">${p.r}</span></div>`).join('')}</div></div>`;
+<div class="bcard"><div class="bcard-tt" style="color:var(--cyan)"><span class="ico">${S.drop('var(--cyan)')}</span>${L.vT} <span class="bcard-sub">${L.vS}</span></div><div class="vl">${L.vascu.map(v=>`<div class="vr"><div class="vr-i">${S[v.ik]('var(--cyan)')}</div><div class="vr-n">${v.n}</div><div class="vr-r">${v.r}</div></div>`).join('')}</div></div>
+<div class="bcard"><div class="bcard-tt" style="color:var(--yellow)"><span class="ico">${S.key('var(--yellow)')}</span>${L.rT}</div><div class="rl">${L.rules.map(r=>`<div class="rr"><span class="rr-i">${S[r.ik]('var(--yellow)')}</span><span class="rr-t"><strong>${r.b}</strong> ${r.d}</span></div>`).join('')}</div></div>
+<div class="bcard"><div class="bcard-tt" style="color:var(--violet)"><span class="ico">${S.chart('var(--violet)')}</span>${L.pT}</div><div class="pl">${L.perio.map(p=>`<div class="pr${p.dl?' dl':''}"><span class="pr-w">${p.w}</span><span class="pr-f">${p.f}</span><span class="pr-r">${p.r}</span></div>`).join('')}</div></div>`;
 p.appendChild(e);w.appendChild(p);});}
 
 function go(i,scroll=true){di=i;const d=D[lang].days[i];setC(d.c,d.a);
-document.querySelectorAll('.dchip').forEach((c,j)=>c.classList.toggle('on',j===i));
-document.querySelectorAll('.nb').forEach((b,j)=>b.classList.toggle('on',j===i));
+document.querySelectorAll('.dchip').forEach((c,j)=>{c.classList.toggle('on',j===i);c.style.setProperty('--dc',D[lang].days[j].c)});
+document.querySelectorAll('.nb').forEach((b,j)=>{b.classList.toggle('on',j===i);b.style.setProperty('--dc',D[lang].days[j].c)});
 document.querySelectorAll('.pnl').forEach((p,j)=>{p.classList.toggle('on',j===i);if(j===i){p.style.animation='none';p.offsetHeight;p.style.animation='';}});
 const ch=document.querySelectorAll('.dchip');if(ch[i])ch[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 if(scroll)$('scroll').scrollTo({top:0,behavior:'smooth'});}
@@ -600,7 +432,9 @@ if(dt<400&&Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.5){const mx=D[lang].days
 
 function initFab(){const f=$('fab'),a=$('scroll');f.onclick=()=>a.scrollTo({top:0,behavior:'smooth'});a.addEventListener('scroll',()=>f.classList.toggle('vis',a.scrollTop>200),{passive:true});}
 
-const id=D[lang].days[di];setC(id.c,id.a);bStrip();bNav();bPanels();initLang();initSwipe();initFab();
+const id=D[lang].days[di];setC(id.c,id.a);
+$('tBadge').textContent=D[lang].badge;$('tTitle').textContent=D[lang].title;$('swh').textContent=D[lang].swh;
+bStrip();bNav();bPanels();initLang();initSwipe();initFab();
 setTimeout(()=>{const ch=document.querySelectorAll('.dchip');if(ch[di])ch[di].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});},150);
 </script>
 </body>
