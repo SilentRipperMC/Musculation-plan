@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Training Plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --card: rgba(255,255,255,0.05);
+      --card-h: rgba(255,255,255,0.09);
+      --bdr: rgba(255,255,255,0.09);
+      --bdr2: rgba(255,255,255,0.16);
+      --t1: #f0f0ff;
+      --t2: #8b8ba8;
+      --t3: #52526a;
+      --violet: #8B5CF6;
+      --cyan: #06B6D4;
+      --rose: #EC4899;
+      --orange: #F97316;
+      --green: #10B981;
+      --yellow: #F59E0B;
+      --blue: #3B82F6;
+      --r: 18px;
+      --r-s: 12px;
+      --r-xs: 8px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --safe-t: env(safe-area-inset-top, 0px);
+      --day-color: var(--violet);
+      --day-alpha: rgba(139,92,246,0.18);
+      --nav-h: 68px;
+    }
+
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── AMBIENT ── */
+    .amb { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .amb-1 { position: absolute; top: -15%; left: -15%; width: 55%; height: 55%; background: radial-gradient(ellipse, rgba(139,92,246,0.09), transparent 70%); }
+    .amb-2 { position: absolute; bottom: -15%; right: -10%; width: 50%; height: 50%; background: radial-gradient(ellipse, rgba(6,182,212,0.07), transparent 70%); }
+    .amb-d { position: absolute; top: 30%; left: 50%; transform: translateX(-50%); width: 70%; height: 40%; background: radial-gradient(ellipse, var(--day-alpha), transparent 70%); transition: background 0.6s ease; }
+
+    /* ── APP ── */
+    .app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100dvh; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      padding: calc(var(--safe-t) + 10px) clamp(12px, 3vw, 24px) 10px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(24px) saturate(1.5);
+      -webkit-backdrop-filter: blur(24px) saturate(1.5);
+      border-bottom: 1px solid var(--bdr);
+      display: flex; align-items: center; gap: 10px;
+      animation: fdDown 0.4s ease both;
+    }
+    .top-l { flex: 1; min-width: 0; }
+    .top-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--violet); background: rgba(139,92,246,0.12);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 100px; padding: 3px 10px; margin-bottom: 2px;
+    }
+    .top-title {
+      font-size: clamp(16px, 4vw, 22px); font-weight: 900; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff, #c4b5fd 50%, #67e8f9);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── LANG PILL ── */
+    .lpill {
+      display: flex; align-items: center;
+      background: var(--card); border: 1px solid var(--bdr);
+      border-radius: 100px; padding: 3px;
+      backdrop-filter: blur(12px);
+      flex-shrink: 0; position: relative;
+    }
+    .lpill-sl {
+      position: absolute; top: 3px; bottom: 3px; border-radius: 100px;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      box-shadow: 0 2px 10px rgba(139,92,246,0.5);
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 1;
+    }
+    .lopt {
+      position: relative; z-index: 2;
+      padding: 5px 10px; font-size: 11px; font-weight: 800;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--t3); cursor: pointer; border-radius: 100px;
+      transition: color 0.25s; user-select: none;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .lopt.active { color: #fff; }
+    .lfl { font-size: 13px; line-height: 1; }
+
+    /* ── DAY STRIP ── */
+    .strip-w {
+      position: sticky; top: calc(var(--safe-t) + 58px); z-index: 90;
+      background: rgba(10,10,15,0.75); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--bdr);
+      animation: fdDown 0.4s 0.05s ease both;
+    }
+    .strip {
+      display: flex; overflow-x: auto; scrollbar-width: none;
+      padding: 8px clamp(8px, 2vw, 16px); gap: clamp(5px, 1.2vw, 10px);
+      -webkit-overflow-scrolling: touch;
+    }
+    .strip::-webkit-scrollbar { display: none; }
+
+    .dchip {
+      flex: 1 0 0; min-width: 48px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: clamp(6px, 1.5vw, 10px) clamp(6px, 1.5vw, 14px);
+      border: 1px solid var(--bdr); border-radius: var(--r-s);
+      background: var(--card); cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+      position: relative; -webkit-tap-highlight-color: transparent;
+    }
+    .dchip::after { content: ''; position: absolute; inset: 0; border-radius: var(--r-s); background: var(--day-color); opacity: 0; transition: opacity 0.22s; }
+    .dchip:active { transform: scale(0.94); }
+    .dchip.on { border-color: var(--day-color); box-shadow: 0 0 0 1px var(--day-color), 0 4px 16px rgba(0,0,0,0.4); }
+    .dchip.on::after { opacity: 0.15; }
+    .dchip-e { font-size: clamp(14px, 3.5vw, 18px); position: relative; z-index: 1; line-height: 1; }
+    .dchip-s { position: relative; z-index: 1; font-size: clamp(8px, 2vw, 11px); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3); transition: color 0.22s; }
+    .dchip.on .dchip-s { color: var(--day-color); }
+    .tdot { position: absolute; top: 4px; right: 4px; z-index: 2; width: 5px; height: 5px; border-radius: 50%; background: var(--day-color); box-shadow: 0 0 6px var(--day-color); animation: pdot 2s infinite; }
+    @keyframes pdot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.6; } }
+
+    /* ── SCROLL AREA ── */
+    .scroll {
+      flex: 1; overflow-y: auto;
+      padding: clamp(12px, 3vw, 24px) clamp(10px, 3vw, 24px) calc(var(--nav-h) + var(--safe-b) + 16px);
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll::-webkit-scrollbar { width: 3px; }
+    .scroll::-webkit-scrollbar-track { background: transparent; }
+    .scroll::-webkit-scrollbar-thumb { background: var(--bdr); border-radius: 10px; }
+
+    /* ── CONTENT WRAPPER — max-width grows with screen ── */
+    .content { max-width: 900px; margin: 0 auto; width: 100%; }
+
+    /* ── PANELS ── */
+    .pnl { display: none; }
+    .pnl.on { display: block; animation: pIn 0.35s cubic-bezier(0.4,0,0.2,1) both; }
+    @keyframes pIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── HERO ── */
+    .hero {
+      border-radius: var(--r); padding: clamp(16px, 4vw, 28px);
+      background: var(--card); border: 1px solid var(--bdr);
+      backdrop-filter: blur(12px);
+      margin-bottom: clamp(12px, 3vw, 20px);
+      position: relative; overflow: hidden;
+    }
+    .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--day-color), transparent); }
+    .hero-glow { position: absolute; top: -30%; right: -10%; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, var(--day-alpha) 0%, transparent 70%); pointer-events: none; }
+    .hero-top { display: flex; align-items: center; gap: clamp(10px, 3vw, 18px); margin-bottom: clamp(10px, 2vw, 16px); }
+    .hero-ico { width: clamp(44px, 12vw, 60px); height: clamp(44px, 12vw, 60px); flex-shrink: 0; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: clamp(22px, 6vw, 30px); background: rgba(255,255,255,0.07); border: 1px solid var(--bdr); box-shadow: 0 0 16px var(--day-alpha); }
+    .hero-info { min-width: 0; }
+    .hero-info h2 { font-size: clamp(18px, 5vw, 26px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; }
+    .hero-today { font-size: 11px; font-weight: 600; color: var(--day-color); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+    .hero-today::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--day-color); box-shadow: 0 0 6px var(--day-color); }
+    .hero-muscle { font-size: clamp(11px, 3vw, 14px); font-weight: 600; color: var(--day-color); margin-top: 2px; }
+    .hero-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+    .hero-chip { display: flex; align-items: center; gap: 5px; font-size: clamp(10px, 2.5vw, 12px); font-weight: 600; color: var(--t2); background: rgba(255,255,255,0.05); border: 1px solid var(--bdr); border-radius: 100px; padding: 4px 10px; }
+
+    /* ── SECTION HEAD ── */
+    .sec-hd { display: flex; align-items: center; gap: 8px; margin: clamp(16px, 3vw, 24px) 0 clamp(8px, 2vw, 12px); }
+    .sec-ico { width: 30px; height: 30px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .sec-tt { font-size: clamp(12px, 3vw, 15px); font-weight: 800; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sec-tm { font-size: 10px; font-weight: 700; color: var(--t3); background: rgba(255,255,255,0.04); border: 1px solid var(--bdr); border-radius: 100px; padding: 3px 9px; flex-shrink: 0; }
+
+    /* ── EXERCISE CARD ── */
+    .exl { display: flex; flex-direction: column; gap: 7px; }
+
+    .exc {
+      background: var(--card); border: 1px solid var(--bdr);
+      border-radius: var(--r-s); padding: clamp(10px, 2.5vw, 16px);
+      display: flex; align-items: center; gap: clamp(8px, 2vw, 14px);
+      backdrop-filter: blur(10px); transition: all 0.2s ease;
+      position: relative; overflow: hidden;
+      -webkit-tap-highlight-color: transparent; cursor: default;
+    }
+    .exc::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--day-color); border-radius: 0 3px 3px 0; opacity: 0; transition: opacity 0.2s; }
+    .exc:hover { background: var(--card-h); border-color: var(--bdr2); transform: translateX(3px); box-shadow: 0 4px 20px rgba(0,0,0,0.3), -3px 0 16px var(--day-alpha); }
+    .exc:hover::before { opacity: 1; }
+    .exc:active { transform: scale(0.985); background: var(--card-h); }
+    .exc:active::before { opacity: 1; }
+
+    .exc-i { width: clamp(34px, 9vw, 42px); height: clamp(34px, 9vw, 42px); flex-shrink: 0; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 4vw, 18px); transition: all 0.2s; }
+    .exc:hover .exc-i, .exc:active .exc-i { background: var(--day-alpha); border-color: var(--day-color); }
+
+    .exc-b { flex: 1; min-width: 0; overflow: hidden; }
+    .exc-n { font-size: clamp(12px, 3vw, 14px); font-weight: 700; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .exc-t { font-size: clamp(10px, 2.3vw, 11px); color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* BADGES inline row */
+    .exc-bgs { display: flex; gap: 4px; flex-shrink: 0; }
+    .exc-bg { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid var(--bdr); border-radius: 7px; padding: clamp(3px, 0.8vw, 5px) clamp(5px, 1.5vw, 10px); min-width: clamp(32px, 9vw, 48px); }
+    .exc-bg-l { font-size: clamp(7px, 1.8vw, 9px); font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: 0.07em; }
+    .exc-bg-v { font-size: clamp(10px, 2.5vw, 13px); font-weight: 800; color: var(--day-color); line-height: 1.2; white-space: nowrap; }
+
+    /* ── FINISHER ── */
+    .fin {
+      margin-top: 8px; padding: clamp(12px, 3vw, 18px);
+      background: linear-gradient(135deg, rgba(249,115,22,0.13), rgba(236,72,153,0.09));
+      border: 1px solid rgba(249,115,22,0.28); border-radius: var(--r-s);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .fin-ico { font-size: clamp(22px, 6vw, 28px); flex-shrink: 0; }
+    .fin-bd h4 { font-size: 13px; font-weight: 800; color: #FED7AA; margin-bottom: 3px; }
+    .fin-bd p { font-size: clamp(10px, 2.5vw, 12px); color: var(--t2); line-height: 1.4; }
+
+    /* ── BOTTOM CARD ── */
+    .bcard { margin-top: clamp(10px, 2.5vw, 16px); padding: clamp(14px, 3vw, 22px); background: var(--card); border: 1px solid var(--bdr); border-radius: var(--r); backdrop-filter: blur(12px); }
+    .bcard-tt { font-size: clamp(11px, 2.8vw, 14px); font-weight: 800; margin-bottom: clamp(8px, 2vw, 14px); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .bcard-sub { font-size: 10px; font-weight: 500; color: var(--t3); }
+
+    /* vascu */
+    .vl { display: flex; flex-direction: column; gap: 6px; }
+    .vr { display: flex; align-items: center; gap: 10px; padding: clamp(8px, 2vw, 12px); background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.18); border-radius: var(--r-xs); }
+    .vr-i { font-size: 18px; flex-shrink: 0; }
+    .vr-n { font-size: clamp(11px, 2.5vw, 13px); font-weight: 600; color: var(--t1); flex: 1; min-width: 0; }
+    .vr-r { font-size: clamp(10px, 2.3vw, 12px); font-weight: 700; color: var(--cyan); white-space: nowrap; }
+
+    /* rules */
+    .rl { display: flex; flex-direction: column; gap: 6px; }
+    .rr { display: flex; align-items: flex-start; gap: 8px; padding: clamp(7px, 1.8vw, 10px); background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.15); border-radius: var(--r-xs); }
+    .rr-i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .rr-t { font-size: clamp(11px, 2.5vw, 13px); color: var(--t2); font-weight: 500; line-height: 1.4; }
+    .rr-t strong { color: var(--t1); font-weight: 800; }
+
+    /* perio */
+    .pl { display: flex; flex-direction: column; gap: 5px; }
+    .pr { display: flex; align-items: center; gap: clamp(6px, 2vw, 12px); padding: clamp(7px, 1.8vw, 10px) clamp(8px, 2vw, 14px); background: rgba(255,255,255,0.03); border: 1px solid var(--bdr); border-radius: var(--r-xs); }
+    .pr-w { font-size: clamp(10px, 2.3vw, 12px); font-weight: 800; color: var(--violet); min-width: clamp(48px, 14vw, 72px); white-space: nowrap; }
+    .pr-f { font-size: clamp(10px, 2.3vw, 13px); font-weight: 500; color: var(--t2); flex: 1; min-width: 0; }
+    .pr-r { font-size: clamp(9px, 2vw, 11px); font-weight: 800; padding: 3px 7px; border-radius: 100px; background: rgba(139,92,246,0.15); color: var(--violet); border: 1px solid rgba(139,92,246,0.25); white-space: nowrap; flex-shrink: 0; }
+    .pr.dl .pr-r { background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.25); }
+
+    /* ── BOTTOM NAV ── */
+    .bnav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      padding: 0 clamp(6px, 2vw, 14px) calc(var(--safe-b) + 6px);
+      background: rgba(10,10,15,0.88);
+      backdrop-filter: blur(28px) saturate(1.4);
+      -webkit-backdrop-filter: blur(28px) saturate(1.4);
+      border-top: 1px solid var(--bdr);
+    }
+    .bnav-in { display: flex; gap: 3px; padding-top: 6px; max-width: 600px; margin: 0 auto; }
+    .nb {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: clamp(5px, 1.5vw, 8px) 2px; background: transparent; border: none;
+      cursor: pointer; border-radius: var(--r-xs); transition: all 0.18s;
+      position: relative; -webkit-tap-highlight-color: transparent;
+    }
+    .nb::before { content: ''; position: absolute; inset: 0; border-radius: var(--r-xs); background: var(--day-color); opacity: 0; transition: opacity 0.18s; }
+    .nb.on::before { opacity: 0.14; }
+    .nb.on { box-shadow: 0 0 0 1px var(--day-color); }
+    .nb-e { position: relative; z-index: 1; font-size: clamp(16px, 4.5vw, 22px); line-height: 1; transition: transform 0.18s; }
+    .nb.on .nb-e { transform: scale(1.15) translateY(-1px); }
+    .nb:active .nb-e { transform: scale(0.88); }
+    .nb-l { position: relative; z-index: 1; font-size: clamp(7px, 1.8vw, 9px); font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--t3); transition: color 0.18s; }
+    .nb.on .nb-l { color: var(--day-color); }
+    .nb-dot { position: absolute; top: 3px; right: clamp(4px, 1.5vw, 12px); z-index: 2; width: 5px; height: 5px; border-radius: 50%; background: var(--day-color); box-shadow: 0 0 5px var(--day-color); animation: pdot 2s infinite; }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed; right: clamp(10px, 3vw, 20px); bottom: calc(var(--nav-h) + var(--safe-b) + 10px);
+      z-index: 150; width: 38px; height: 38px; border-radius: 50%;
+      background: var(--card); border: 1px solid var(--bdr2);
+      backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; cursor: pointer; opacity: 0; pointer-events: none;
+      transform: translateY(10px); transition: all 0.25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fab.vis { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .fab:active { transform: scale(0.88); }
+
+    .swh { text-align: center; padding: 10px 0 0; font-size: clamp(9px, 2vw, 11px); font-weight: 500; color: var(--t3); letter-spacing: 0.05em; opacity: 0.5; }
+
+    @keyframes fdDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ══════════════════════════════
+       BREAKPOINTS — TRULY ADAPTIVE
+    ══════════════════════════════ */
+
+    /* ── ≥480 : wider phones / small tablets ── */
+    @media (min-width: 480px) {
+      .exc-bgs { gap: 5px; }
+      .rl { display: grid; grid-template-columns: 1fr 1fr; }
+      .vl { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── ≥680 : tablets ── */
+    @media (min-width: 680px) {
+      .scroll { padding-bottom: calc(var(--nav-h) + var(--safe-b) + 24px); }
+      .rl { grid-template-columns: 1fr 1fr 1fr; }
+      .vl { grid-template-columns: 1fr 1fr 1fr; }
+      .exl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    }
+
+    /* ── ≥900 : desktop ── */
+    @media (min-width: 900px) {
+      :root { --nav-h: 0px; }
+      .bnav { display: none; }
+      .fab { bottom: 24px; }
+      .scroll { padding-bottom: 40px; }
+      .strip-w { position: static; border-bottom: none; background: transparent; backdrop-filter: none; }
+      .strip { max-width: 900px; margin: 0 auto; padding: 14px 24px; gap: 10px; justify-content: center; }
+      .dchip { flex: 0 1 auto; min-width: 80px; padding: 10px 18px; transition: all 0.2s, transform 0.2s; }
+      .dchip:hover:not(.on) { transform: translateY(-2px); background: var(--card-h); }
+      .topbar { justify-content: center; }
+      .top-l { flex: none; }
+      .topbar { padding-left: 32px; padding-right: 32px; gap: 20px; }
+      .content { max-width: 900px; }
+      .exl { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .exc:hover { transform: translateX(4px) translateY(-1px); }
+    }
+
+    /* ── ≥1200 : large desktop ── */
+    @media (min-width: 1200px) {
+      .content { max-width: 1000px; }
+      .exl { grid-template-columns: 1fr 1fr; gap: 12px; }
+      body { background: #050508; }
+      body::after { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(139,92,246,0.04) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+    }
+
+    /* ── ≤359 : tiny phones ── */
+    @media (max-width: 359px) {
+      .exc-bgs { display: none; }
+      .exc-n { white-space: normal; }
+      .dchip-s { font-size: 7px; }
+      .lopt { padding: 4px 7px; font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="amb"><div class="amb-1"></div><div class="amb-2"></div><div class="amb-d" id="ambD"></div></div>
+
+<div class="app">
+
+  <div class="topbar">
+    <div class="top-l">
+      <div class="top-badge" id="tBadge">🏋️ Programme</div>
+      <div class="top-title" id="tTitle">Plan d'Entraînement</div>
+    </div>
+    <div class="lpill" id="lPill">
+      <div class="lpill-sl" id="lSl"></div>
+      <div class="lopt active" id="oFR"><span class="lfl">🇫🇷</span>FR</div>
+      <div class="lopt" id="oEN"><span class="lfl">🇬🇧</span>EN</div>
+    </div>
+  </div>
+
+  <div class="strip-w"><div class="strip" id="strip"></div></div>
+
+  <div class="scroll" id="scroll">
+    <div class="content" id="cWrap"></div>
+    <div class="swh" id="swh">← Swipe ou tap pour changer de jour →</div>
+  </div>
+
+  <nav class="bnav"><div class="bnav-in" id="bNav"></div></nav>
+</div>
+
+<div class="fab" id="fab">⬆️</div>
+
+<script>
+const D={
+fr:{
+badge:'🏋️ Programme',title:"Plan d'Entraînement",today:"Aujourd'hui",
+swh:'← Swipe ou tap pour changer de jour →',
+S:'Séries',R:'Reps',Re:'Repos',ex:n=>`${n} exercices`,
+finT:'Finisher — 2 min',
+vT:'💉 Vascularité Quotidienne',vS:'5 min à la maison',
+rT:'🔑 Règles d\'Or', pT:'📊 Périodisation · 8 semaines',
+days:[
+{l:'Lundi',s:'LUN',e:'🔴',c:'#EC4899',a:'rgba(236,72,153,0.18)',m:'Pectoraux + Avant-bras',d:'1h',
+sec:[{t:'Pectoraux',i:'💪',tm:'45 min',ex:[
+{i:'📐',n:'Développé incliné haltères',s:'4',r:'6-8',re:'2min',tip:'Tempo 3-1-1'},
+{i:'🏋️',n:'Développé couché barre',s:'4',r:'8-10',re:'90s',tip:'Descente contrôlée'},
+{i:'🔀',n:'Écarté poulie vis-à-vis',s:'3',r:'12-15',re:'60s',tip:'Croiser les mains'},
+{i:'📐',n:'Écarté incliné haltères',s:'3',r:'12-15',re:'60s',tip:'Étirement profond'},
+{i:'⬇️',n:'Pompes dropset',s:'2',r:'Max',re:'45s',tip:'Pieds surélevés → sol → genoux'}]},
+{t:'Avant-bras',i:'💉',tm:'15 min',ex:[
+{i:'🔨',n:'Curl marteau lourd',s:'3',r:'10-12',re:'60s',tip:'Descente 3 sec'},
+{i:'🖐️',n:'Wrist curl (sur banc)',s:'3',r:'20',re:'45s',tip:'Squeeze en haut'},
+{i:'🧗',n:'Dead hang',s:'2',r:'Max',re:'45s',tip:'Congestion'}]}]},
+{l:'Mardi',s:'MAR',e:'🟠',c:'#F97316',a:'rgba(249,115,22,0.18)',m:'Dos + Avant-bras',d:'1h',
+sec:[{t:'Dos',i:'🦅',tm:'45 min',ex:[
+{i:'🏅',n:'Tractions (lestées si possible)',s:'4',r:'6-8',re:'2min',tip:'Prise large'},
+{i:'🏋️',n:'Rowing barre penché',s:'4',r:'8-10',re:'90s',tip:'Tirer vers nombril'},
+{i:'⬇️',n:'Tirage poulie haute (neutre)',s:'3',r:'10-12',re:'60s',tip:'Squeeze omoplates'},
+{i:'💪',n:'Rowing haltère un bras',s:'3',r:'10-12',re:'60s',tip:'Étirement complet'},
+{i:'🔃',n:'Hyperextensions',s:'3',r:'15',re:'60s',tip:'Disque sur poitrine'}]},
+{t:'Avant-bras',i:'💉',tm:'15 min',ex:[
+{i:'🔄',n:'Reverse curl barre EZ',s:'3',r:'12-15',re:'60s',tip:'Pronation stricte'},
+{i:'🧳',n:"Farmer's walk",s:'3',r:'30sec',re:'60s',tip:'Le plus lourd possible'},
+{i:'✊',n:'Gripper / serrer balle',s:'2',r:'50/main',re:'30s',tip:'Congestion max'}]}]},
+{l:'Mercredi',s:'MER',e:'🟡',c:'#F59E0B',a:'rgba(245,158,11,0.18)',m:'Épaules + Abdos',d:'1h',
+sec:[{t:'Épaules',i:'🦾',tm:'45 min',ex:[
+{i:'🏋️',n:'Développé militaire debout',s:'4',r:'6-8',re:'2min',tip:'Strict'},
+{i:'↔️',n:'Élévations latérales haltères',s:'4',r:'12-15',re:'60s',tip:'Pouce vers le bas'},
+{i:'🦜',n:'Oiseau haltères penché',s:'3',r:'12-15',re:'60s',tip:'Squeeze 2 sec'},
+{i:'🎯',n:'Face pulls',s:'3',r:'15-20',re:'45s',tip:'Rotation externe'},
+{i:'⬆️',n:'Shrugs haltères',s:'3',r:'12-15',re:'60s',tip:'Tenir 3 sec en haut'}]},
+{t:'Abdos',i:'🔥',tm:'15 min',ex:[
+{i:'🔗',n:'Crunch poulie haute',s:'3',r:'15-20',re:'45s',tip:''},
+{i:'🦵',n:'Relevé de jambes suspendu',s:'3',r:'12-15',re:'45s',tip:''},
+{i:'⏱️',n:'Gainage planche',s:'2',r:'45sec',re:'30s',tip:''}]}]},
+{l:'Jeudi',s:'JEU',e:'🟢',c:'#10B981',a:'rgba(16,185,129,0.18)',m:'Bras + Avant-bras',d:'1h',
+sec:[{t:'Biceps',i:'💪',tm:'20 min',ex:[
+{i:'🏋️',n:'Curl barre EZ',s:'3',r:'8-10',re:'90s',tip:'Strict'},
+{i:'📐',n:'Curl incliné haltères',s:'3',r:'10-12',re:'60s',tip:'Étirement max'},
+{i:'🎯',n:'Curl concentré',s:'2',r:'12-15',re:'45s',tip:'Squeeze 3 sec'}]},
+{t:'Triceps',i:'🔱',tm:'20 min',ex:[
+{i:'⬇️',n:'Dips (lestés si possible)',s:'3',r:'8-10',re:'90s',tip:'Buste droit'},
+{i:'🧠',n:'Barre au front',s:'3',r:'10-12',re:'60s',tip:'Derrière la tête'},
+{i:'🔗',n:'Extensions poulie corde',s:'3',r:'12-15',re:'45s',tip:'Écarter en bas'}]},
+{t:'Avant-bras — Vascularité',i:'💉',tm:'20 min',ex:[
+{i:'🔄',n:'Reverse curl léger',s:'3',r:'20',re:'30s',tip:'Pompe maximale'},
+{i:'🖐️',n:'Wrist curl',s:'3',r:'25',re:'30s',tip:'Séries longues'},
+{i:'↩️',n:'Reverse wrist curl',s:'2',r:'25',re:'30s',tip:'Léger'},
+{i:'🔗',n:'Curl marteau corde poulie',s:'2',r:'20',re:'30s',tip:'Congestion'}]}],
+fin:'Serrer balle 100 reps → Dead hang max → Veines qui explosent 💥'},
+{l:'Vendredi',s:'VEN',e:'🔵',c:'#3B82F6',a:'rgba(59,130,246,0.18)',m:'Quadriceps + Mollets',d:'1h',
+sec:[{t:'Quadriceps',i:'🦵',tm:'40 min',ex:[
+{i:'🏋️',n:'Squat barre',s:'4',r:'6-8',re:'2m30',tip:'Parallèle minimum'},
+{i:'🦾',n:'Presse à cuisses',s:'4',r:'10-12',re:'90s',tip:'Pieds bas et serrés'},
+{i:'🚶',n:'Fentes marchées',s:'3',r:'10/jambe',re:'60s',tip:'Pas court'},
+{i:'🔗',n:'Leg extension',s:'3',r:'15',re:'60s',tip:'Squeeze 2 sec'}]},
+{t:'Mollets',i:'⚡',tm:'20 min',ex:[
+{i:'⬆️',n:'Mollets debout',s:'4',r:'12',re:'60s',tip:'Pause 2 sec en bas'},
+{i:'🪑',n:'Mollets assis',s:'3',r:'20',re:'45s',tip:'Squeeze en haut'},
+{i:'🦶',n:'Mollets un pied',s:'2',r:'25',re:'30s',tip:'Brûlure totale'}]}]},
+{l:'Samedi',s:'SAM',e:'🟣',c:'#8B5CF6',a:'rgba(139,92,246,0.18)',m:'Ischio + Fessiers + Abdos',d:'1h',
+sec:[{t:'Ischio-jambiers',i:'🦿',tm:'25 min',ex:[
+{i:'🏋️',n:'Soulevé de terre roumain',s:'4',r:'8-10',re:'2min',tip:'Étirement ischios'},
+{i:'🔗',n:'Leg curl allongé',s:'3',r:'12',re:'60s',tip:'Squeeze en haut'},
+{i:'🌅',n:'Good mornings',s:'3',r:'12',re:'60s',tip:'Dos droit'}]},
+{t:'Fessiers',i:'🍑',tm:'20 min',ex:[
+{i:'🦁',n:'Hip thrust',s:'4',r:'10-12',re:'90s',tip:'Squeeze 3 sec'},
+{i:'🧗',n:'Fentes bulgares',s:'3',r:'10/jambe',re:'60s',tip:'Descendre bas'},
+{i:'🦵',n:'Kickback poulie',s:'2',r:'15',re:'45s',tip:'Grand fessier'}]},
+{t:'Abdos',i:'🔥',tm:'15 min',ex:[
+{i:'⚙️',n:'Ab wheel',s:'3',r:'10-12',re:'45s',tip:''},
+{i:'🌀',n:'Russian twist',s:'3',r:'20',re:'30s',tip:''},
+{i:'🔃',n:'Crunch inversé',s:'3',r:'15',re:'45s',tip:''}]}]}],
+vascu:[{i:'🎾',n:'Serrer balle tennis',r:'100/main'},{i:'🔄',n:'Rotation poignets haltère léger',r:'30s/sens'},{i:'🖐️',n:'Extension doigts élastique',r:'50 reps'}],
+rules:[{i:'📓',b:'Note tout',d:'— poids, reps, sensations'},{i:'🥩',b:'Protéines',d:'— 1.8-2.2g/kg/jour'},{i:'😴',b:'Sommeil',d:'— 7-9h minimum'},{i:'💧',b:'Eau',d:'— 3-4 litres/jour'},{i:'📉',b:'Bodyfat',d:'— Sous 12-13% pour les veines'},{i:'🏳️',b:'Deload semaine 7',d:'— Obligatoire !'}],
+perio:[{w:'Sem. 1-2',f:'Apprentissage du tempo',r:'RPE 7',dl:false},{w:'Sem. 3-4',f:'Montée en charge',r:'RPE 8',dl:false},{w:'Sem. 5-6',f:'Intensification + dropsets',r:'RPE 9',dl:false},{w:'Sem. 7',f:'DELOAD — -40% volume',r:'RPE 5',dl:true},{w:'Sem. 8',f:'Nouveau cycle (+2.5-5%)',r:'RPE 7',dl:false}]
+},
+en:{
+badge:'🏋️ Weekly Program',title:'Training Plan',today:'Today',
+swh:'← Swipe or tap to change day →',
+S:'Sets',R:'Reps',Re:'Rest',ex:n=>`${n} exercises`,
+finT:'Finisher — 2 min',
+vT:'💉 Daily Vascularity',vS:'5 min at home',
+rT:'🔑 Golden Rules',pT:'📊 Periodization · 8 weeks',
+days:[
+{l:'Monday',s:'MON',e:'🔴',c:'#EC4899',a:'rgba(236,72,153,0.18)',m:'Chest + Forearms',d:'1h',
+sec:[{t:'Chest',i:'💪',tm:'45 min',ex:[
+{i:'📐',n:'Incline Dumbbell Press',s:'4',r:'6-8',re:'2min',tip:'Tempo 3-1-1'},
+{i:'🏋️',n:'Barbell Bench Press',s:'4',r:'8-10',re:'90s',tip:'Controlled descent'},
+{i:'🔀',n:'Cable Crossover',s:'3',r:'12-15',re:'60s',tip:'Cross hands over'},
+{i:'📐',n:'Incline Dumbbell Fly',s:'3',r:'12-15',re:'60s',tip:'Deep stretch'},
+{i:'⬇️',n:'Push-Up Dropset',s:'2',r:'Max',re:'45s',tip:'Feet elevated → flat → knees'}]},
+{t:'Forearms',i:'💉',tm:'15 min',ex:[
+{i:'🔨',n:'Heavy Hammer Curl',s:'3',r:'10-12',re:'60s',tip:'3 sec descent'},
+{i:'🖐️',n:'Wrist Curl (on bench)',s:'3',r:'20',re:'45s',tip:'Squeeze at top'},
+{i:'🧗',n:'Dead Hang',s:'2',r:'Max',re:'45s',tip:'Pump'}]}]},
+{l:'Tuesday',s:'TUE',e:'🟠',c:'#F97316',a:'rgba(249,115,22,0.18)',m:'Back + Forearms',d:'1h',
+sec:[{t:'Back',i:'🦅',tm:'45 min',ex:[
+{i:'🏅',n:'Pull-Up (weighted if possible)',s:'4',r:'6-8',re:'2min',tip:'Wide grip'},
+{i:'🏋️',n:'Bent Over Barbell Row',s:'4',r:'8-10',re:'90s',tip:'Pull to navel'},
+{i:'⬇️',n:'Lat Pulldown (neutral grip)',s:'3',r:'10-12',re:'60s',tip:'Squeeze shoulder blades'},
+{i:'💪',n:'One Arm Dumbbell Row',s:'3',r:'10-12',re:'60s',tip:'Full stretch'},
+{i:'🔃',n:'Back Extension',s:'3',r:'15',re:'60s',tip:'Plate on chest'}]},
+{t:'Forearms',i:'💉',tm:'15 min',ex:[
+{i:'🔄',n:'Reverse Curl (EZ Bar)',s:'3',r:'12-15',re:'60s',tip:'Strict pronation'},
+{i:'🧳',n:"Farmer's Walk",s:'3',r:'30sec',re:'60s',tip:'As heavy as possible'},
+{i:'✊',n:'Gripper / Ball Squeeze',s:'2',r:'50/hand',re:'30s',tip:'Max pump'}]}]},
+{l:'Wednesday',s:'WED',e:'🟡',c:'#F59E0B',a:'rgba(245,158,11,0.18)',m:'Shoulders + Abs',d:'1h',
+sec:[{t:'Shoulders',i:'🦾',tm:'45 min',ex:[
+{i:'🏋️',n:'Standing Overhead Press',s:'4',r:'6-8',re:'2min',tip:'Strict'},
+{i:'↔️',n:'Dumbbell Lateral Raise',s:'4',r:'12-15',re:'60s',tip:'Thumbs down'},
+{i:'🦜',n:'Bent Over Reverse Fly',s:'3',r:'12-15',re:'60s',tip:'Squeeze 2 sec'},
+{i:'🎯',n:'Face Pull',s:'3',r:'15-20',re:'45s',tip:'External rotation'},
+{i:'⬆️',n:'Dumbbell Shrug',s:'3',r:'12-15',re:'60s',tip:'Hold 3 sec at top'}]},
+{t:'Abs',i:'🔥',tm:'15 min',ex:[
+{i:'🔗',n:'Cable Crunch',s:'3',r:'15-20',re:'45s',tip:''},
+{i:'🦵',n:'Hanging Leg Raise',s:'3',r:'12-15',re:'45s',tip:''},
+{i:'⏱️',n:'Plank',s:'2',r:'45sec',re:'30s',tip:''}]}]},
+{l:'Thursday',s:'THU',e:'🟢',c:'#10B981',a:'rgba(16,185,129,0.18)',m:'Arms + Forearms',d:'1h',
+sec:[{t:'Biceps',i:'💪',tm:'20 min',ex:[
+{i:'🏋️',n:'EZ Bar Curl',s:'3',r:'8-10',re:'90s',tip:'Strict'},
+{i:'📐',n:'Incline Dumbbell Curl',s:'3',r:'10-12',re:'60s',tip:'Max stretch'},
+{i:'🎯',n:'Concentration Curl',s:'2',r:'12-15',re:'45s',tip:'Squeeze 3 sec'}]},
+{t:'Triceps',i:'🔱',tm:'20 min',ex:[
+{i:'⬇️',n:'Dip (weighted if possible)',s:'3',r:'8-10',re:'90s',tip:'Upright torso'},
+{i:'🧠',n:'Skull Crusher',s:'3',r:'10-12',re:'60s',tip:'Behind the head'},
+{i:'🔗',n:'Cable Rope Pushdown',s:'3',r:'12-15',re:'45s',tip:'Spread rope at bottom'}]},
+{t:'Forearms — Vascularity',i:'💉',tm:'20 min',ex:[
+{i:'🔄',n:'Light Reverse Curl',s:'3',r:'20',re:'30s',tip:'Maximum pump'},
+{i:'🖐️',n:'Wrist Curl',s:'3',r:'25',re:'30s',tip:'Long sets'},
+{i:'↩️',n:'Reverse Wrist Curl',s:'2',r:'25',re:'30s',tip:'Light'},
+{i:'🔗',n:'Cable Rope Hammer Curl',s:'2',r:'20',re:'30s',tip:'Pump'}]}],
+fin:'Ball Squeeze 100 reps → Dead Hang max → Veins explode 💥'},
+{l:'Friday',s:'FRI',e:'🔵',c:'#3B82F6',a:'rgba(59,130,246,0.18)',m:'Quads + Calves',d:'1h',
+sec:[{t:'Quads',i:'🦵',tm:'40 min',ex:[
+{i:'🏋️',n:'Barbell Back Squat',s:'4',r:'6-8',re:'2m30',tip:'Parallel minimum'},
+{i:'🦾',n:'Leg Press',s:'4',r:'10-12',re:'90s',tip:'Feet low and narrow'},
+{i:'🚶',n:'Walking Lunge',s:'3',r:'10/leg',re:'60s',tip:'Short steps'},
+{i:'🔗',n:'Leg Extension',s:'3',r:'15',re:'60s',tip:'Squeeze 2 sec'}]},
+{t:'Calves',i:'⚡',tm:'20 min',ex:[
+{i:'⬆️',n:'Standing Calf Raise',s:'4',r:'12',re:'60s',tip:'2 sec pause at bottom'},
+{i:'🪑',n:'Seated Calf Raise',s:'3',r:'20',re:'45s',tip:'Squeeze at top'},
+{i:'🦶',n:'Single Leg Calf Raise',s:'2',r:'25',re:'30s',tip:'Total burn'}]}]},
+{l:'Saturday',s:'SAT',e:'🟣',c:'#8B5CF6',a:'rgba(139,92,246,0.18)',m:'Hamstrings + Glutes + Abs',d:'1h',
+sec:[{t:'Hamstrings',i:'🦿',tm:'25 min',ex:[
+{i:'🏋️',n:'Romanian Deadlift (RDL)',s:'4',r:'8-10',re:'2min',tip:'Hamstring stretch'},
+{i:'🔗',n:'Lying Leg Curl',s:'3',r:'12',re:'60s',tip:'Squeeze at top'},
+{i:'🌅',n:'Good Morning',s:'3',r:'12',re:'60s',tip:'Straight back'}]},
+{t:'Glutes',i:'🍑',tm:'20 min',ex:[
+{i:'🦁',n:'Barbell Hip Thrust',s:'4',r:'10-12',re:'90s',tip:'Squeeze 3 sec'},
+{i:'🧗',n:'Bulgarian Split Squat',s:'3',r:'10/leg',re:'60s',tip:'Go deep'},
+{i:'🦵',n:'Cable Kickback',s:'2',r:'15',re:'45s',tip:'Glute max'}]},
+{t:'Abs',i:'🔥',tm:'15 min',ex:[
+{i:'⚙️',n:'Ab Wheel Rollout',s:'3',r:'10-12',re:'45s',tip:''},
+{i:'🌀',n:'Russian Twist',s:'3',r:'20',re:'30s',tip:''},
+{i:'🔃',n:'Reverse Crunch',s:'3',r:'15',re:'45s',tip:''}]}]}],
+vascu:[{i:'🎾',n:'Tennis Ball Squeeze',r:'100/hand'},{i:'🔄',n:'Wrist Rotation (light dumbbell)',r:'30s/dir'},{i:'🖐️',n:'Finger Extension (rubber band)',r:'50 reps'}],
+rules:[{i:'📓',b:'Log everything',d:'— weight, reps, feelings'},{i:'🥩',b:'Protein',d:'— 1.8-2.2g/kg/day'},{i:'😴',b:'Sleep',d:'— 7-9h minimum'},{i:'💧',b:'Water',d:'— 3-4 liters/day'},{i:'📉',b:'Bodyfat',d:'— Under 12-13% for veins'},{i:'🏳️',b:'Deload week 7',d:'— Mandatory!'}],
+perio:[{w:'Wk. 1-2',f:'Tempo learning',r:'RPE 7',dl:false},{w:'Wk. 3-4',f:'Load increase',r:'RPE 8',dl:false},{w:'Wk. 5-6',f:'Intensification + dropsets',r:'RPE 9',dl:false},{w:'Wk. 7',f:'DELOAD — -40% volume',r:'RPE 5',dl:true},{w:'Wk. 8',f:'New cycle (+2.5-5% load)',r:'RPE 7',dl:false}]
+}};
+
+let lang='fr', di=(()=>{const d=new Date().getDay();return d===0?5:d-1})();
+
+const $=id=>document.getElementById(id);
+
+function setC(c,a){document.documentElement.style.setProperty('--day-color',c);document.documentElement.style.setProperty('--day-alpha',a);}
+
+function bStrip(){const s=$('strip');s.innerHTML='';D[lang].days.forEach((d,i)=>{const c=document.createElement('div');c.className='dchip'+(i===di?' on':'');c.style.setProperty('--day-color',d.c);c.innerHTML=`${i===di?`<div class="tdot"></div>`:''}<div class="dchip-e">${d.e}</div><div class="dchip-s">${d.s}</div>`;c.onclick=()=>go(i);s.appendChild(c);});}
+
+function bNav(){const n=$('bNav');n.innerHTML='';D[lang].days.forEach((d,i)=>{const b=document.createElement('button');b.className='nb'+(i===di?' on':'');b.style.setProperty('--day-color',d.c);b.innerHTML=`${i===di?`<div class="nb-dot"></div>`:''}<div class="nb-e">${d.e}</div><div class="nb-l">${d.s}</div>`;b.onclick=()=>go(i);n.appendChild(b);});}
+
+function bPanels(){const w=$('cWrap');w.innerHTML='';const L=D[lang];
+L.days.forEach((d,idx)=>{const p=document.createElement('div');p.className='pnl'+(idx===di?' on':'');p.id='p'+idx;
+const isT=idx===di,tot=d.sec.reduce((a,s)=>a+s.ex.length,0);
+p.innerHTML=`<div class="hero" style="--day-color:${d.c};--day-alpha:${d.a}"><div class="hero-glow"></div><div class="hero-top"><div class="hero-ico" style="box-shadow:0 0 16px ${d.a}">${d.e}</div><div class="hero-info"><h2>${d.l}</h2>${isT?`<div class="hero-today" style="--day-color:${d.c}">${L.today}</div>`:''}<div class="hero-muscle" style="color:${d.c}">${d.m}</div></div></div><div class="hero-chips"><div class="hero-chip">⏱️ ${d.d}</div><div class="hero-chip">📋 ${L.ex(tot)}</div></div></div>`;
+
+d.sec.forEach(sec=>{const se=document.createElement('div');let h='<div class="exl">';
+sec.ex.forEach(x=>{h+=`<div class="exc" style="--day-color:${d.c};--day-alpha:${d.a}"><div class="exc-i">${x.i}</div><div class="exc-b"><div class="exc-n">${x.n}</div>${x.tip?`<div class="exc-t">💡 ${x.tip}</div>`:''}</div><div class="exc-bgs"><div class="exc-bg"><span class="exc-bg-l">${L.S}</span><span class="exc-bg-v">${x.s}</span></div><div class="exc-bg"><span class="exc-bg-l">${L.R}</span><span class="exc-bg-v">${x.r}</span></div><div class="exc-bg"><span class="exc-bg-l">${L.Re}</span><span class="exc-bg-v">${x.re}</span></div></div></div>`;});
+h+='</div>';se.innerHTML=`<div class="sec-hd"><div class="sec-ico">${sec.i}</div><div class="sec-tt">${sec.t}</div><div class="sec-tm">${sec.tm}</div></div>${h}`;p.appendChild(se);});
+
+if(d.fin){const f=document.createElement('div');f.innerHTML=`<div class="fin"><div class="fin-ico">🔥</div><div class="fin-bd"><h4>${L.finT}</h4><p>${d.fin}</p></div></div>`;p.appendChild(f);}
+
+const e=document.createElement('div');e.innerHTML=`
+<div class="bcard"><div class="bcard-tt" style="color:var(--cyan)">${L.vT} <span class="bcard-sub">${L.vS}</span></div><div class="vl">${L.vascu.map(v=>`<div class="vr"><div class="vr-i">${v.i}</div><div class="vr-n">${v.n}</div><div class="vr-r">${v.r}</div></div>`).join('')}</div></div>
+<div class="bcard"><div class="bcard-tt" style="color:var(--yellow)">${L.rT}</div><div class="rl">${L.rules.map(r=>`<div class="rr"><span class="rr-i">${r.i}</span><span class="rr-t"><strong>${r.b}</strong> ${r.d}</span></div>`).join('')}</div></div>
+<div class="bcard"><div class="bcard-tt" style="color:var(--violet)">${L.pT}</div><div class="pl">${L.perio.map(p=>`<div class="pr${p.dl?' dl':''}"><span class="pr-w">${p.w}</span><span class="pr-f">${p.f}</span><span class="pr-r">${p.r}</span></div>`).join('')}</div></div>`;
+p.appendChild(e);w.appendChild(p);});}
+
+function go(i,scroll=true){di=i;const d=D[lang].days[i];setC(d.c,d.a);
+document.querySelectorAll('.dchip').forEach((c,j)=>c.classList.toggle('on',j===i));
+document.querySelectorAll('.nb').forEach((b,j)=>b.classList.toggle('on',j===i));
+document.querySelectorAll('.pnl').forEach((p,j)=>{p.classList.toggle('on',j===i);if(j===i){p.style.animation='none';p.offsetHeight;p.style.animation='';}});
+const ch=document.querySelectorAll('.dchip');if(ch[i])ch[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+if(scroll)$('scroll').scrollTo({top:0,behavior:'smooth'});}
+
+function initLang(){const sl=$('lSl'),fr=$('oFR'),en=$('oEN'),pill=$('lPill');
+function mv(l){const t=l==='fr'?fr:en,pr=pill.getBoundingClientRect(),tr=t.getBoundingClientRect();sl.style.left=(tr.left-pr.left)+'px';sl.style.width=tr.width+'px';fr.classList.toggle('active',l==='fr');en.classList.toggle('active',l==='en');}
+requestAnimationFrame(()=>mv('fr'));
+function sw(l){if(lang===l)return;lang=l;mv(l);document.documentElement.lang=l;
+$('tBadge').textContent=D[l].badge;$('tTitle').textContent=D[l].title;$('swh').textContent=D[l].swh;
+const w=$('cWrap');w.style.opacity='0';w.style.transition='opacity 0.15s';
+setTimeout(()=>{bStrip();bNav();bPanels();go(di,false);w.style.opacity='1';},150);}
+fr.onclick=()=>sw('fr');en.onclick=()=>sw('en');}
+
+function initSwipe(){const a=$('scroll');let sx=0,sy=0,st=0;
+a.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;st=Date.now();},{passive:true});
+a.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy,dt=Date.now()-st;
+if(dt<400&&Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.5){const mx=D[lang].days.length-1;if(dx<0&&di<mx)go(di+1);if(dx>0&&di>0)go(di-1);}},{passive:true});}
+
+function initFab(){const f=$('fab'),a=$('scroll');f.onclick=()=>a.scrollTo({top:0,behavior:'smooth'});a.addEventListener('scroll',()=>f.classList.toggle('vis',a.scrollTop>200),{passive:true});}
+
+const id=D[lang].days[di];setC(id.c,id.a);bStrip();bNav();bPanels();initLang();initSwipe();initFab();
+setTimeout(()=>{const ch=document.querySelectorAll('.dchip');if(ch[di])ch[di].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});},150);
+</script>
+</body>
+</html>
